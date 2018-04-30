@@ -1,0 +1,27 @@
+// ==== Structures =====================================================================================================
+
+typedef struct // PodFileHeader
+{
+    uint fileSize;
+    uint numOffsets;
+    uint offsets[numOffsets];
+} PodFileHeader <fgcolor=0x0000FF>;
+
+typedef struct // PodString
+{
+    ubyte length;
+    byte data[length];
+} PodString <fgcolor=0x000088, read=PodStringRead>;
+
+// ==== Template Methods ===============================================================================================
+
+string PodStringRead(PodString &value)
+{
+    char decData[value.length];
+    local int i <hidden=true>;
+    for (i = 0; i < value.length; i++) 
+    {
+        decData[i] = value.data[i] ^ ~i;
+    }
+    return decData;
+}

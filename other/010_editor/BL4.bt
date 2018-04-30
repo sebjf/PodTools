@@ -1,0 +1,220 @@
+//------------------------------------------------
+//--- 010 Editor v8.0 Binary Template
+//
+//      File: BL4.bt
+//   Authors: Syroot
+//   Version: 0.1.0
+//   Purpose: Parse decrypted Pod BL4 files.
+//  Category: Pod
+// File Mask: *.dec.bin
+//  ID Bytes: 
+//   History: 
+//  0.1.0   2017-10-02  Initial version.
+
+// ==== Forward Declarations ===========================================================================================
+
+struct Bl4File;
+struct Events; struct Trigger; struct Macro;
+struct TextureList; struct TextureRegions; struct TextureRegion; struct TexturePixels;
+struct Model; struct Mesh; struct MeshFace;
+struct Visibility;
+struct Environment; struct ContactArray;
+
+// ==== Includes =======================================================================================================
+
+#include "Math.bt"
+#include "Pod.bt"
+
+// ==== Structures =====================================================================================================
+
+typedef struct // Bl4File
+{
+    PodFileHeader header;
+    // Read main chunk.
+    FSeek(header.offsets[0]);
+    uint reserved1; // 0x00000003
+    uint reserved2; // unused
+    Events events;
+    PodString trackName;
+    uint levelOfDetail[16];
+    PodString projectName;
+    TextureList textures(256, 256);
+	Model model;
+    uint numVisibility;
+    Visibility visibilities[numVisibility] <optimize=false>;
+    uint numMacroEnvironment;
+    Macro environmentMacros(3)[numMacroEnvironment];
+    uint numEnvironment;
+    Environment environments[numEnvironment] <optimize=false>;
+} Bl4File <bgcolor=0xCDFFFF>;
+
+// ---- Events ----
+
+typedef struct // Events
+{
+    // Read triggers.
+    uint numTrigger;
+    uint bufferSize;
+    Trigger triggers[numTrigger] <optimize=false>;
+    // Read macros.
+    uint numMacroFirst;
+    if (numMacroFirst) Macro macroFirst(3)[numMacroFirst];
+    uint numMacro;
+    if (numMacro) Macro macro(1)[numMacro];
+    uint numMacroInit;
+    if (numMacroInit) Macro macro(1)[numMacroInit];
+    uint numMacroActive;
+    if (numMacroActive) Macro macro(1)[numMacroActive];
+    uint numMacroInactive;
+    if (numMacroInactive) Macro macro(1)[numMacroInactive];
+    uint numMacroReplace;
+    if (numMacroReplace) Macro macro(2)[numMacroReplace];
+    uint numMacroExchange;
+    if (numMacroExchange) Macro macro(2)[numMacroExchange];
+} Events <bgcolor=0xCDE6FF>;
+
+typedef struct // Trigger
+{
+    PodString name;
+    uint paramSize;
+    int paramCount;
+    if (paramSize * paramCount) ubyte paramData[paramSize * paramCount];
+} Trigger <bgcolor=0xBDD4EB, read=TriggerRead>;
+
+typedef struct(int valueCount) // Macro
+{
+    if (valueCount) int values[valueCount];
+} Macro;
+
+// ---- Textures ----
+
+typedef struct(int width, int height) // TextureList
+{
+    uint numTexture;
+    uint reserved;
+    TextureRegions regions[numTexture] <optimize=false>;
+    TexturePixels pixels(width, height)[numTexture] <optimize=true>;
+} TextureList <fgcolor=0x808000>;
+
+typedef struct // TextureRegions
+{
+    uint numRegion;
+    TextureRegion regions[numRegion];
+} TextureRegions;
+
+typedef struct // TextureRegion
+{
+    char name[32];
+    uint left;
+    uint top;
+    uint right;
+    uint bottom;
+    uint index;
+} TextureRegion <read=TextureRegionRead>;
+
+typedef struct(int width, int height) // TexturePixels
+{
+    ushort data[width * height]; // RGB565
+} TexturePixels;
+
+// ---- Model ----
+
+typedef struct
+{
+    uint hasNamedFaces;
+    uint numMesh;
+    Mesh meshes(hasNamedFaces)[numMesh] <optimize=false>;
+} Model <fgcolor=0x800000>;
+
+typedef struct(uint hasNamedFaces)
+{
+    uint numVertex;
+    Vector3F16x16 positions[numVertex];
+    uint numFace;
+    uint numTriangle;
+    uint numQuad;
+    MeshFace faces(hasNamedFaces)[numFace] <optimize=false>;
+    Vector3F16x16 normals[numVertex];
+    uint unknown; // Color?
+    ubyte vertexLight[numVertex];
+    Vector3F16x16 boundingBoxMin; // z -= 2
+    Vector3F16x16 boundingBoxMax; // z += 10
+} Mesh <fgcolor=0x800000>;
+
+typedef struct(uint hasNamedFaces)
+{
+    if (hasNamedFaces) PodString name;
+    uint numVertex;
+    uint vertexIndices[4];
+    Vector3F16x16 normal;
+    PodString materialType;
+    uint colorOrTextureIndex;
+    Vector2 texCoords[4];
+    uint reserved; // Color?
+    if (numVertex == 4) Vector3F16x16 quadReserved;
+    if (normal.x || normal.y || normal.z)
+    {
+        uint unknown;
+        uint properties;
+    }
+    else
+    {
+        uint reserved;
+    }
+} MeshFace <read=MeshFaceRead>;
+
+// ---- Visibility ----
+
+typedef struct // Visibility
+{
+    int numVisibleMeshIndex; // -1 = no meshes are visible
+    if (numVisibleMeshIndex > 0)
+		uint visibleMeshesIndices[numVisibleMeshIndex];
+} Visibility <bgcolor=0xCDCDFF>;
+
+// ---- Environment ----
+
+typedef struct // Environment
+{
+    PodString environmentName;
+    PodString name;
+    TextureList textures(128, 128);
+    uint hasNamedFaces;
+    Mesh mesh(hasNamedFaces);
+    Vector3 collisionPrism1;
+    uint collisionPrism2;
+    Vector3 collisionPrism3;
+    uint unknown1;
+    Vector3 unknown2;
+    uint unknown3;
+    uint unknown4;
+    uint numContactArray;
+    ContactArray contactArrays[numContactArray];
+} Environment <bgcolor=0xEFCDFF>;
+
+typedef struct // ContactArray
+{
+    ubyte data[64];
+} ContactArray <bgcolor=0xDCBDEB>;
+
+// ==== File Contents ==================================================================================================
+
+LittleEndian();
+Bl4File file <open=true>;
+
+// ==== Template Methods ===============================================================================================
+
+string TextureRegionRead(TextureRegion &value)
+{
+    return value.name;
+}
+
+string TriggerRead(Trigger &value)
+{
+    return PodStringRead(value.name);
+}
+
+string MeshFaceRead(MeshFace &value)
+{
+    return PodStringRead(value.name);
+}
