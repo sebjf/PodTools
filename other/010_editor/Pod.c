@@ -1,5 +1,3 @@
-// ==== Structures =====================================================================================================
-
 typedef struct // PbdfHeader
 {
 	uint fileSize;
@@ -17,9 +15,6 @@ typedef struct // PbdfString
 	for (i = 0; i < length; i++)
 		decData[i] = data[i] ^ ~i;
 } PbdfString <fgcolor=0x000088, read=PbdfStringRead>;
-
-// ==== Template Methods ===============================================================================================
-
 string PbdfStringRead(PbdfString &value)
 {
 	return value.decData;
