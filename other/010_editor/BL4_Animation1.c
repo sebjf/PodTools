@@ -12,6 +12,10 @@ typedef struct // Animation1List
 		Macro macros(3)[numMacro] <optimize = true>;
 		uint numAnimation1;
 		Animation1 animation1s[numAnimation1] <optimize = false>;
+		uint numSector;
+		if (circuit.sectorList.num)
+			Animation1SectorList sectorDefaultsList;
+		Animation1SectorList sectorList[circuit.sectorList.num] <optimize = false>;
 	}
 } Animation1List <read = Animation1ListRead>;
 string Animation1ListRead(Animation1List& value)
@@ -32,13 +36,9 @@ typedef struct // Animation1
 	uint value3; // ushort
 	Animation1ObjectAnim objectAnims[numObjectAnim] <optimize = false>;
 	if (numTextureAnim) Animation1TextureAnim textureAnims[numTextureAnim] <optimize = false>;
-	uint numSector;
-	if (circuit.sectorList.num)
-		Animation1SectorList sectorDefaultsList;
-	Animation1SectorList sectorList[circuit.sectorList.num] <optimize = false>;
 } Animation1;
 
-typedef struct // Animation1Object
+typedef struct // Animation1ObjectAnim
 {
 	uint startFrame;
 	uint numFrame;
