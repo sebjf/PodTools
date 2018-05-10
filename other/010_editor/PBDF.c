@@ -1,3 +1,5 @@
+struct PbdfHeader; struct PbdfString;
+
 typedef struct // PbdfHeader
 {
 	uint fileSize;
