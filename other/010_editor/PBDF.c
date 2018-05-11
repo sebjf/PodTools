@@ -21,3 +21,10 @@ string PbdfStringRead(PbdfString &value)
 {
 	return value.decData;
 }
+
+void PbdfSeekOffset(uint idxOffset)
+{
+	local uint headerSize = header.offsets[0];
+	local uint offset = header.offsets[idxOffset];
+	FSeek(offset - (offset / blockSize * sizeof(uint)));
+}

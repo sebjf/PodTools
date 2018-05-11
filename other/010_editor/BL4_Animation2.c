@@ -10,7 +10,7 @@ struct Animation2SectorAnimValue;
 typedef struct // Animation2List
 {
 	uint num;
-	Animation2 animation2s[(num + 1) / 2] <optimize = false>;
+	if (num) Animation2 animation2s[(num + 1) / 2] <optimize = false>;
 } Animation2List;
 
 typedef struct // Animation2
@@ -71,7 +71,7 @@ typedef struct // Animation2SectorAnimSector
 {
 	uint idxSector;
 	uint numValue;
-	Animation2SectorAnimValue values[numValue];
+	Animation2SectorAnimValue values[numValue] <optimize = true>;
 } Animation2SectorAnimSector;
 
 typedef struct // Animation2SectorAnimValue

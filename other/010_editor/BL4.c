@@ -25,11 +25,14 @@
 #include "BL4_Sound.c";
 #include "BL4_Background.c";
 #include "BL4_Animation2.c";
+#include "BL4_RepairZone.c";
+#include "BL4_Designation.c";
+#include "BL4_Difficulty.c";
+#include "BL4_Competitor.c";
 
 typedef struct // Circuit
 {
-	// Read main chunk.
-	FSeek(header.offsets[0]);
+	PbdfSeekOffset(0);
 	uint check; // 3
 	uint unused;
 	EventList events <bgcolor = 0xCDE6FF>;
@@ -47,9 +50,35 @@ typedef struct // Circuit
 	Background background <bgcolor = 0xFFEFCD>;
 	Sky sky <bgcolor = 0xEBDCBD>;
 	Animation2List animation2List <bgcolor = 0xEBBDBD>;
+	RepairZoneList repairZoneList <bgcolor = 0xFFEFCD>;
+
+	Designation designationForward <bgcolor = 0xEFFFCD>;
+	Difficulty diffForward <bgcolor = 0xCDFFCD>;
+	DifficultyLevel diffLevelForwardEasy <bgcolor = 0xCDFFCD>;
+	PbdfSeekOffset(1);
+	DifficultyLevel diffLevelForwardNormal <bgcolor = 0xCDFFCD>;
+	PbdfSeekOffset(2);
+	DifficultyLevel diffLevelForwardHard <bgcolor = 0xCDFFCD>;
+
+	PbdfSeekOffset(3);
+	Designation designationReverse <bgcolor = 0xEFFFCD>;
+	Difficulty diffReverse <bgcolor = 0xCDFFCD>;
+	DifficultyLevel diffLevelReverseEasy <bgcolor = 0xCDFFCD>;
+	PbdfSeekOffset(4);
+	DifficultyLevel diffLevelReverseMedium <bgcolor = 0xCDFFCD>;
+	PbdfSeekOffset(5);
+	DifficultyLevel diffLevelReverseHard <bgcolor = 0xCDFFCD>;
+
+	PbdfSeekOffset(6);
+	CompetitorList competitorListEasy <bgcolor = 0xCDFFEF>;
+	PbdfSeekOffset(7);
+	CompetitorList competitorListNormal <bgcolor = 0xCDFFEF>;
+	PbdfSeekOffset(8);
+	CompetitorList competitorListHard <bgcolor = 0xCDFFEF>;
 } Circuit <bgcolor = 0xCDFFFF>;
 
 LittleEndian();
 local uint key = 0x00000000;
+local uint blockSize <format = hex> = 0x00004000;
 PbdfHeader header;
 Circuit circuit <open = true>;

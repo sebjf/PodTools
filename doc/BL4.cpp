@@ -827,6 +827,7 @@ struct RepairZones
 }
 struct DesignationNormal
 {
+	// Designation
 	{
 		uint32_t Value1;  // bool
 		uint32_t Reserved2;
@@ -848,6 +849,7 @@ struct DesignationNormal
 				uint32_t Count;
 				for (Count)
 				{
+					// Macro(3)
 					uint32_t Value1;
 					uint32_t Value2;
 					uint32_t Value3;
@@ -856,6 +858,7 @@ struct DesignationNormal
 			uint32_t Value1;
 			for (Value1)
 			{
+				// DesignationMacro
 				uint8_t  Value2[60];
 				uint32_t Value3;  // MacroIndex
 				uint32_t Value4;  // MacroIndex

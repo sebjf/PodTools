@@ -5,8 +5,8 @@ string boolRead(bool& value)
 {
 	return value ? "true" : "false";
 }
-local bool true = 1;
-local bool false = 0;
+local bool true <hidden = true> = 1;
+local bool false <hidden = true> = 0;
 
 typedef union // Dword
 {
