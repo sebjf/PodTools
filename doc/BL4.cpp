@@ -677,16 +677,13 @@ struct Sounds  // *.hp
 		}
 	}
 }
-struct Fog
+struct Background
 {
 	uint32_t Value1;  // (not used?) FogDistance?
 	uint32_t Value2;  // (not used?) FogIntensity?
-}
-struct Background
-{
 	uint32_t Value3;  // (not used?) BackDepth?
 	uint32_t Value4;  // (not used?) BackBottom?
-	uint32_t Value5;  // uint8_t (use background texture)
+	uint32_t hasTexture;  // uint8_t (use background texture)
 	uint32_t Value6;  // uint8_t (bit0..bit2 -> RGB=0xFF)
 	PbdfString Name;       // F*
 	struct Texture
@@ -711,17 +708,17 @@ struct Background
 			uint8_t Pixel[256][256][2];  // RGB565
 		}
 	}
+	uint32_t yStart;
+	uint32_t yEnd;
 }
 struct Sky
 {
-	uint32_t Value1;
-	uint32_t Value2;
-	uint32_t Value3;
-	uint32_t Value4;
+	uint32_t hasSky;
+	uint32_t yEffect;
 	uint32_t Value5;
 	int32_t  Value6;  // -7000..7000
-	uint32_t Value7;
-	uint32_t Value8;
+	uint32_t horizonGlowStrength;
+	uint32_t speed;
 	PbdfString Name;  // C*
 	struct Texture
 	{
@@ -763,13 +760,16 @@ struct Animations2  // *.cta, *.ita, "ANIME SECTEUR"
 		}
 		else
 		{
+			// Animation2
 			uint32_t AnimationCount;
 			for (AnimationCount)
 			{
+				// Animation2TextureAnim
 				PbdfString Name;
 				uint32_t Count;
 				for (Count)
 				{
+					// Animation2TextureAnimKey
 					uint32_t TextureIndex;  // uint16_t
 					uint32_t TexUV[8];      // uint8_t
 				}
@@ -777,6 +777,7 @@ struct Animations2  // *.cta, *.ita, "ANIME SECTEUR"
 				uint32_t FrameCount;
 				for (FrameCount)
 				{
+					// Animation2TextureAnimFrame
 					uint32_t AbsTime;
 					uint32_t Index;
 				}
@@ -785,14 +786,17 @@ struct Animations2  // *.cta, *.ita, "ANIME SECTEUR"
 			uint32_t SectorAnimationCount;
 			for (SectorAnimationCount)
 			{
+				// Animation2SectorAnim
 				uint32_t AnimationIndex;
 				uint32_t SectorCount;
 				for (SectorCount)
 				{
+					// Animation2SectorAnimSector
 					uint32_t SectorIndex;
 					uint32_t Count;
 					for (Count)
 					{
+						// Animation2SectorAnimValue
 						uint32_t Looping;    // bool
 						uint32_t FaceType;   // 3 or 4 vertices
 						uint32_t FaceIndex;  // into Tri- or Quad-list

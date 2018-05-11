@@ -12,7 +12,11 @@ typedef struct // Background
 	TextureList textures(256, 256, 2); // RGB565
 	int yStart;
 	int yEnd;
-} Background;
+} Background <read = BackgroundRead>;
+string BackgroundRead(Background& value)
+{
+	return PbdfStringRead(value.name);
+}
 
 typedef struct // Sky
 {
@@ -26,4 +30,9 @@ typedef struct // Sky
 	TextureList textures(128, 128, 2); // RGB565
 	TextureImage lensflare(128, 128, 2); // RGB565
 	uint reserved;
-} Sky;
+} Sky <read = SkyRead>;
+string SkyRead(Sky& value)
+{
+	return PbdfStringRead(value.name);
+}
+ 

@@ -24,6 +24,7 @@
 #include "BL4_Animation1.c"
 #include "BL4_Sound.c";
 #include "BL4_Background.c";
+#include "BL4_Animation2.c";
 
 typedef struct // Circuit
 {
@@ -41,10 +42,11 @@ typedef struct // Circuit
 	VisibleList visibleList <bgcolor = 0xBDBDEB>;
 	EnvironmentList environmentList <bgcolor = 0xEFCDFF>;
 	LightSectorList lightSectorList <bgcolor = 0xFFCDEF>;
-	Animation1List animations1List <bgcolor = 0xFFCDCD>;
+	Animation1List animation1List <bgcolor = 0xFFCDCD>;
 	SoundList soundList <bgcolor = 0xFFD6CD>;
 	Background background <bgcolor = 0xFFEFCD>;
 	Sky sky <bgcolor = 0xEBDCBD>;
+	Animation2List animation2List <bgcolor = 0xEBBDBD>;
 } Circuit <bgcolor = 0xCDFFFF>;
 
 LittleEndian();
