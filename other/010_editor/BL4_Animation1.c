@@ -6,7 +6,7 @@ struct Animation1SectorList; struct Animation1Sector;
 typedef struct // Animation1List
 {
 	PbdfString fileName;
-	if (fileName.decData != "NEANT")
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint numMacro;
 		Macro macros(3)[numMacro] <optimize = true>;

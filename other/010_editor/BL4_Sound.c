@@ -3,7 +3,7 @@ struct SoundList; struct Sound;
 typedef struct // SoundList
 {
 	PbdfString fileName;
-	if (fileName.decData != "NEANT")
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint num;
 		Sound sounds[num] <optimize = true>;

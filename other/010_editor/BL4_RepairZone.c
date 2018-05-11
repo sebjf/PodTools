@@ -3,8 +3,8 @@ struct RepairZone;
 
 typedef struct // RepairZoneList
 {
-	PbdfString name;
-	if (name.decData != "NEANT")
+	PbdfString fileName;
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint num;
 		RepairZone repairZones[num] <optimize = true>;
@@ -13,7 +13,7 @@ typedef struct // RepairZoneList
 } RepairZoneList <read = RepairZoneListRead>;
 string RepairZoneListRead(RepairZoneList& value)
 {
-	return PbdfStringRead(value.name);
+	return PbdfStringRead(value.fileName);
 }
 
 typedef struct // RepairZone

@@ -10,8 +10,8 @@ typedef struct // Difficulty
 typedef struct // DifficultyLevel
 {
 	PbdfString difficultyName;
-	PbdfString levName;
-	if (levName.decData != "NEANT")
+	PbdfString fileName;
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint numPosition; // Enr_Positions
 		Vector3F16x16 positions[numPosition];
@@ -39,8 +39,8 @@ typedef struct // DifficultyLevel
 			} constraints[numConstraint] <optimize = true>;
 		}
 	}
-	PbdfString levName2;
-	if (levName2.decData != "NEANT")
+	PbdfString fileName2;
+	if (!PbdfStringCompare(fileName2, "NEANT"))
 	{
 		uint value1;
 		uint numSubA;
@@ -53,9 +53,9 @@ typedef struct // DifficultyLevel
 			uint value7;
 			uint value8;
 			uint numValueA;
-			uint valueA[numValueA];
+			if (numValueA) uint valueA[numValueA];
 			uint numValueB;
-			uint valueB[numValueB];
+			if (numValueB) uint valueB[numValueB];
 		} subAs[numSubA] <optimize = false>;
 		struct SubB
 		{
@@ -67,12 +67,15 @@ typedef struct // DifficultyLevel
 			uint numValueJ;
 			uint valueJ[numValueJ];
 		} subBs[numSubB] <optimize = false>;
-		struct SubC
+		if (numSubC)
 		{
-			uint valueK;
-			uint valueL;
-			int valueM;
-		} subCs[numSubC] <optimize = true>;
+			struct SubC
+			{
+				uint valueK;
+				uint valueL;
+				int valueM;
+			} subCs[numSubC] <optimize = true>;
+		}
 	}
 } DifficultyLevel <read = DifficultyLevelRead>;
 string DifficultyLevelRead(DifficultyLevel& value)

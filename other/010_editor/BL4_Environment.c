@@ -4,7 +4,7 @@ struct EnvironmentObject; struct EnvironmentInstance; struct EnvironmentSectorIn
 typedef struct // EnvironmentList
 {
 	PbdfString fileName;
-	if (fileName.decData != "NEANT")
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint numMacro;
 		if (numMacro) Macro macros(3)[numMacro] <optimize = true>;

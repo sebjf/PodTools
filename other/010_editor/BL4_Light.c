@@ -3,7 +3,7 @@ struct LightSectorList; struct LightSector; struct Light;
 typedef struct // LightSectorList
 {
 	PbdfString fileName;
-	if (fileName.decData != "NEANT")
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint num;
 		uint value1;

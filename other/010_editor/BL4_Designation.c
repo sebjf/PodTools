@@ -16,7 +16,7 @@ typedef struct
 	uint reserved9;
 	uint valueA[5];
 	PbdfString name;
-	if (name.decData != "NEANT")
+	if (!PbdfStringCompare(name, "NEANT"))
 	{
 		uint numMacro;
 		Macro macros(3)[numMacro] <optimize = true>;
@@ -26,9 +26,9 @@ typedef struct
 		DesignationValue values[numValue] <optimize = true>;
 	}
 	uint numPhaseMacros;
-	Macro phaseMacros(3)[numPhaseMacros] <optimize = true>;
+	if (numPhaseMacros) Macro phaseMacros(3)[numPhaseMacros] <optimize = true>;
 	uint numPhase;
-	DesignationPhase phases[numPhase] <optimize = false>;
+	if (numPhase) DesignationPhase phases[numPhase] <optimize = false>;
 } Designation <read = DesignationRead>;
 string DesignationRead(Designation& value)
 {

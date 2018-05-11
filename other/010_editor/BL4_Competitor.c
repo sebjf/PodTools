@@ -4,8 +4,8 @@ struct Competitor;
 typedef struct // CompetitorList
 {
 	PbdfString difficultyName;
-	PbdfString levName;
-	if (levName.decData != "NEANT")
+	PbdfString fileName;
+	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint num;
 		Competitor competitors[num] <optimize = false>;
@@ -23,7 +23,7 @@ typedef struct // Competitor
 	uint value2;
 	PbdfString number;
 	uint numUnk;
-	Vector3U unk[numUnk];
+	if (numUnk) Vector3U unk[numUnk];
 } Competitor <read = CompetitorRead>;
 string CompetitorRead(Competitor& value)
 {
