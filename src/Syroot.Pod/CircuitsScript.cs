@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using Syroot.BinaryData;
-using Syroot.Pod.Core;
 
 namespace Syroot.Pod
 {

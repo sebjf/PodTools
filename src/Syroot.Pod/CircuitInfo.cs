@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Syroot.BinaryData;
-using Syroot.Pod.Core;
+using Syroot.Pod.IO;
 
 namespace Syroot.Pod
 {
@@ -13,28 +13,17 @@ namespace Syroot.Pod
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
         private const int _key = 0x50;
-
-        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
-        
         private const int _maxNameLength = 20;
         private const int _maxDisplayNameLength = 64;
         private const int _maxImageFile1Length = 13;
         private const int _maxImageFile2Length = 13;
         private const int _maxImageFile3Length = 14;
 
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private string _name;
-        private string _menuName;
-        private string _imageFile1;
-        private string _imageFile2;
-        private string _imageFile3;
-
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         internal CircuitInfo(Stream stream)
         {
-            XorByteStreamLayer xorStream = new XorByteStreamLayer(stream, _key);
+            XorStream xorStream = new XorStream(stream, _key);
             Name = xorStream.ReadFixedString(_maxNameLength);
             DisplayName = xorStream.ReadFixedString(_maxDisplayNameLength);
             ImageFile1 = xorStream.ReadFixedString(_maxImageFile1Length);
@@ -58,7 +47,7 @@ namespace Syroot.Pod
         /// </summary>
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (value.Length > _maxNameLength)
@@ -66,6 +55,7 @@ namespace Syroot.Pod
                 _name = value;
             }
         }
+        private string _name;
 
         /// <summary>
         /// Gets or sets the case-insensitive name how the track appears in the menu. Must not be longer than 63
@@ -73,19 +63,20 @@ namespace Syroot.Pod
         /// </summary>
         public string DisplayName
         {
-            get { return _menuName; }
+            get => _displayName;
             set
             {
                 // Requires 1 byte for 0-termination.
                 if (value.Length > _maxDisplayNameLength - 1)
                     throw new ArgumentException($"{nameof(DisplayName)} must not exceed {_maxDisplayNameLength - 1} characters.");
-                _menuName = value;
+                _displayName = value;
             }
         }
-        
+        private string _displayName;
+
         public string ImageFile1
         {
-            get { return _imageFile1; }
+            get => _imageFile1;
             set
             {
                 if (value.Length > _maxImageFile1Length)
@@ -93,10 +84,11 @@ namespace Syroot.Pod
                 _imageFile1 = value;
             }
         }
+        private string _imageFile1;
 
         public string ImageFile2
         {
-            get { return _imageFile2; }
+            get => _imageFile2;
             set
             {
                 if (value.Length > _maxImageFile2Length)
@@ -104,10 +96,11 @@ namespace Syroot.Pod
                 _imageFile2 = value;
             }
         }
+        private string _imageFile2;
 
         public string ImageFile3
         {
-            get { return _imageFile3; }
+            get => _imageFile3;
             set
             {
                 if (value.Length > _maxImageFile3Length)
@@ -115,6 +108,7 @@ namespace Syroot.Pod
                 _imageFile3 = value;
             }
         }
+        private string _imageFile3;
 
         public CircuitFlags Flags { get; set; }
 
@@ -140,7 +134,7 @@ namespace Syroot.Pod
         {
             using (MemoryStream stream = new MemoryStream())
             {
-                XorByteStreamLayer xorStream = new XorByteStreamLayer(stream, _key);
+                XorStream xorStream = new XorStream(stream, _key);
                 xorStream.WriteFixedString(Name, _maxNameLength);
                 xorStream.WriteFixedString(DisplayName, _maxDisplayNameLength);
                 xorStream.WriteFixedString(ImageFile1, _maxImageFile1Length);

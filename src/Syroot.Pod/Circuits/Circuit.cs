@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Syroot.BinaryData;
 using Syroot.Maths;
-using Syroot.Pod.Core;
+using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Circuits
 {
     /// <summary>
     /// Represents BL4 files.
     /// </summary>
-    public class Circuit : EncryptedDataFile
+    public class Circuit : PbdfFile
     {
+        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
+
+        private const int _blockSize = 0x00004000;
+        private const uint _key = 0x00000F7E;
+
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         private byte[] _unparsedData;
@@ -27,16 +33,14 @@ namespace Syroot.Pod.Circuits
         /// Initializes a new instance of the <see cref="Circuit"/> class from the file with the given
         /// <paramref name="fileName"/>.
         /// </summary>
-        /// <param name="fileName">The name of the file to create the instance from.</param>
+        /// <param name="fileName">The name of the file to load data from.</param>
         public Circuit(string fileName) : base(fileName) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Circuit"/> class from the given <paramref name="stream"/>.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to create the instance from.</param>
-        /// <param name="leaveOpen"><c>true</c> to leave <paramref name="stream"/> open after creating the instance.
-        /// </param>
-        public Circuit(Stream stream, bool leaveOpen = false) : base(stream, leaveOpen) { }
+        /// <param name="stream">The <see cref="Stream"/> to load data from.</param>
+        public Circuit(Stream stream) : base(stream) { }
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -49,44 +53,19 @@ namespace Syroot.Pod.Circuits
         public IList<Macro> MacrosInactive { get; set; }
         public IList<Macro> MacrosReplace { get; set; }
         public IList<Macro> MacrosExchange { get; set; }
-
         public string TrackName { get; set; }
         public IList<uint> LevelOfDetail { get; set; }
         public string ProjectName { get; set; }
-
         public IList<Texture> Textures { get; set; }
-
         public Model Model { get; set; }
-
-        /// <summary>
-        /// Gets or sets the XOR key used to encrypt or decrypt data with.
-        /// </summary>
-        protected override uint Key => 0x00000F7E; // ????? Why not return actual key instead of this hard-coded one?
-
-        /// <summary>
-        /// Gets or sets the size of a data chunk at which end a checksum follows.
-        /// </summary>
-        protected override int BlockSize => 0x00004000; // ????? Same here
+        public IList<Visibility> Visibilities { get; set; }
 
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// Called before data is loaded to reset properties to default values.
-        /// </summary>
-        protected override void Reset()
-        {
-            base.Reset();
-        }
-
-        /// <summary>
-        /// Loads strongly typed data from the given <paramref name="stream"/>.
-        /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> storing the raw data, positioned behind the file header.
-        /// </param>
         protected override void LoadData(Stream stream)
         {
-            uint reserved1 = stream.ReadUInt32(); // always 3
-            uint reserved2 = stream.ReadUInt32(); // not used
+            uint checksum = stream.ReadUInt32(); // must be 3
+            uint reserved = stream.ReadUInt32(); // not used
 
             LoadEvents(stream);
             LoadMacros(stream);
@@ -97,17 +76,14 @@ namespace Syroot.Pod.Circuits
 
             LoadTextures(stream);
             LoadModel(stream);
+            LoadVisibilities(stream);
 
             _unparsedData = stream.ReadBytes((int)(stream.Length - stream.Position));
         }
 
-        /// <summary>
-        /// Saves strongly typed data in the given <paramref name="stream"/>.
-        /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> in which to store the raw data, positioned behind the file
-        /// header.</param>
         protected override void SaveData(Stream stream)
         {
+            throw new NotImplementedException();
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
@@ -272,6 +248,19 @@ namespace Syroot.Pod.Circuits
                 mesh.VertexLights = stream.ReadBytes(vertexCount);
                 mesh.BoundingBoxMin = stream.ReadVector3F16x16();
                 mesh.BoundingBoxMax = stream.ReadVector3F16x16();
+            }
+        }
+
+        private void LoadVisibilities(Stream stream)
+        {
+            int count = stream.ReadInt32();
+            Visibilities = new List<Visibility>(count);
+
+            while (count-- > 0)
+            {
+                Visibility visibility = new Visibility();
+                Visibilities.Add(visibility);
+                visibility.VisibleMeshes = stream.ReadUInt32s(Math.Max(0, stream.ReadInt32())).ToList();
             }
         }
     }

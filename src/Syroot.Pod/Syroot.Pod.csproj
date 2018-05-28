@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AssemblyName>Syroot.Pod</AssemblyName>
 		<AssemblyTitle>Syroot.Pod</AssemblyTitle>
 		<Authors>Syroot</Authors>
 		<Copyright>(c) Syroot, licensed under MIT</Copyright>
 		<Description>.NET library reading and writing Pod game file formats.</Description>
+		<LangVersion>latest</LangVersion>
 		<PackageIconUrl>https://raw.githubusercontent.com/Syroot/Pod/master/res/Logo.png</PackageIconUrl>
 		<PackageId>Syroot.Pod</PackageId>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/Pod/master/LICENSE</PackageLicenseUrl>
@@ -19,5 +20,6 @@
 	<ItemGroup>
 		<PackageReference Include="Syroot.BinaryData" Version="5.0.0-beta1" />
 		<PackageReference Include="Syroot.Maths" Version="1.5.1" />
+		<PackageReference Include="System.Memory" Version="4.5.0-rc1" />
 	</ItemGroup>
 </Project>

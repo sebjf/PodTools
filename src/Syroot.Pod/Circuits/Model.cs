@@ -1,28 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using Syroot.Maths;
 
 namespace Syroot.Pod.Circuits
 {
+    /// <summary>
+    /// Represents a collection of <see cref="Mesh"/> instances which form a complete 3-dimensional model.
+    /// </summary>
     public class Model
     {
-        public bool HasNamedFaces;
-        public IList<Mesh> Meshes;
+        // ---- PROPERTIES ---------------------------------------------------------------------------------------------
+
+        public bool HasNamedFaces { get; set; }
+        public IList<Mesh> Meshes { get; set; }
     }
 
+    /// <summary>
+    /// Represents the surface of a logically connected part in a <see cref="Model"/>.
+    /// </summary>
     public class Mesh
     {
-        public IList<Vector3U> Positions;
-        public IList<Face> Faces;
-        public IList<Vector3F> Normals;
-        public uint Unknown;
-        public IList<byte> VertexLights;
-        public Vector3F BoundingBoxMin; // Z -= 2
-        public Vector3F BoundingBoxMax; // Z += 10
+        // ---- PROPERTIES ---------------------------------------------------------------------------------------------
+
+        public IList<Vector3U> Positions { get; set; }
+        public IList<Face> Faces { get; set; }
+        public IList<Vector3F> Normals { get; set; }
+        public uint Unknown { get; set; }
+        public IList<byte> VertexLights { get; set; }
+        public Vector3F BoundingBoxMin { get; set; } // Z -= 2
+        public Vector3F BoundingBoxMax { get; set; } // Z += 10
     }
 
+    /// <summary>
+    /// Represents a polygon connected by multiple vertices, forming the surface of a <see cref="Mesh"/>.
+    /// </summary>
     [DebuggerDisplay(nameof(Face) + " {Name}")]
     public class Face
     {
