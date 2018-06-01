@@ -56,14 +56,14 @@ namespace Syroot.Pod.IO
         /// <param name="inStream">The input <see cref="Stream"/> storing the encrypted data.</param>
         /// <param name="outStream">The output <see cref="Stream"/> storing the decrypted data.</param>
         /// <param name="key">The XOR encryption key.</param>
-        /// <param name="blockSize">The size of a block in bytes at which end a checksum follows.</param>
+        /// <param name="blockSize">The size of a block in bytes at which end a checksum is placed.</param>
         public static void Decrypt(Stream inStream, Stream outStream, uint key, int blockSize)
         {
             int blockIndex = 0;
             int blockDataSize = blockSize - sizeof(uint);
             int blockDataDwordCount = blockDataSize / sizeof(uint);
             byte[] block = new byte[blockSize];
-            Span<uint> blockDword = MemoryMarshal.Cast<byte, uint>(block); // Little endian
+            Span<uint> blockDword = MemoryMarshal.Cast<byte, uint>(block); // Requires little endian
             while (!inStream.IsEndOfStream())
             {
                 // Process a block.
@@ -85,7 +85,6 @@ namespace Syroot.Pod.IO
                     uint lastValue = 0;
                     for (; i < blockDataDwordCount; i++)
                     {
-                        ref uint value = ref blockDword[i];
                         uint keyValue = 0;
                         switch (lastValue >> 16 & 3)
                         {
@@ -94,6 +93,7 @@ namespace Syroot.Pod.IO
                             case 2: keyValue = (lastValue + 0x07091971) << 1; break;
                             case 3: keyValue = (0x11E67319 - lastValue) << 1; break;
                         }
+                        ref uint value = ref blockDword[i];
                         lastValue = value;
                         switch (lastValue & 3)
                         {
@@ -119,14 +119,14 @@ namespace Syroot.Pod.IO
         /// <param name="inStream">The input <see cref="Stream"/> storing the decrypted data.</param>
         /// <param name="outStream">The output <see cref="Stream"/> storing the encrypted data.</param>
         /// <param name="key">The XOR encryption key.</param>
-        /// <param name="blockSize">The size of a block in bytes at which end a checksum follows.</param>
+        /// <param name="blockSize">The size of a block in bytes at which end a checksum is placed.</param>
         public static void Encrypt(Stream inStream, Stream outStream, uint key, int blockSize)
         {
             int blockIndex = 0;
             int blockDataSize = blockSize - sizeof(uint);
-            int blockDataDwordCount = blockSize / sizeof(uint) - 1;
+            int blockDataDwordCount = blockDataSize / sizeof(uint);
             byte[] block = new byte[blockSize];
-            Span<uint> blockDword = MemoryMarshal.Cast<byte, uint>(block); // Little endian
+            Span<uint> blockDword = MemoryMarshal.Cast<byte, uint>(block); // Requires little endian
             while (!inStream.IsEndOfStream())
             {
                 // Process a block.
@@ -180,7 +180,7 @@ namespace Syroot.Pod.IO
         /// match decrypted data positions.
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> to read decrypted data from.</param>
-        /// <param name="blockSize">The size of a block in bytes at which end a checksum follows.</param>
+        /// <param name="blockSize">The size of a block in bytes at which end a checksum is placed.</param>
         /// <returns>The list of read and adjusted offsets.</returns>
         public static IList<int> ReadHeader(Stream stream, int blockSize)
         {
@@ -197,8 +197,8 @@ namespace Syroot.Pod.IO
         /// <summary>
         /// Writes the PBDF file header with adjusted offsets to point to encrypted data positions.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to read decrypted data from.</param>
-        /// <param name="blockSize">The size of a block in bytes at which end a checksum follows.</param>
+        /// <param name="stream">The <see cref="Stream"/> to write the header to.</param>
+        /// <param name="blockSize">The size of a block in bytes at which end a checksum is placed.</param>
         /// <param name="offsets">The list of offsets which will be adjusted to point to encrypted data positions.
         /// </param>
         /// <param name="dataSize">The size of the file data (excluding the header) in bytes.</param>

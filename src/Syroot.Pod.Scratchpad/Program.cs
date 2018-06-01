@@ -12,7 +12,7 @@ namespace Syroot.Pod.Scratchpad
         {
             string circuitFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup";
             string decFolder = @"D:\Pictures\Circuits";
-            string encFolder = @"D:\Pictures\Circuits\New";
+            string encFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
 
             Directory.CreateDirectory(decFolder);
             Directory.CreateDirectory(encFolder);
