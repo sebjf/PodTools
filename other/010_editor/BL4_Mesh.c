@@ -49,7 +49,7 @@ typedef struct(uint hasName, bool hasUnkNormalProperty) // MeshFace
 	{
 		uint reserved;
 	}
-} MeshFace <read = SectorFaceRead>;
+} MeshFace <read = MeshFaceRead>;
 string MeshFaceRead(MeshFace& value)
 {
 	return PbdfStringRead(value.name);
