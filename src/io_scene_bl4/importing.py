@@ -2,7 +2,7 @@ import os
 import io
 import bpy
 import bpy_extras
-from . import bl4
+from .bl4 import *
 from . import pbdf
 
 
@@ -22,10 +22,12 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         description="Filepath used for importing the BL4 file",
         maxlen=1024)
 
+    def __init__(self):
+        self.circuit = None
+
     def execute(self, context):
         file_name = self.properties.filepath
         file_size = os.path.getsize(file_name)
-        circuit = bl4.Circuit()
         with io.BytesIO() as dec_file:
             with open(file_name, "rb") as f:
                 key = pbdf.retrieve_key(f, file_size)
@@ -34,5 +36,9 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 f.seek(0)
                 pbdf.decrypt(f, dec_file, key, block_size)
                 dec_file.seek(0)
-                circuit.load(dec_file, block_size)
+                self.circuit = Circuit.load(dec_file, key, block_size)
+        self.convert()
         return {'FINISHED'}
+
+    def convert(self):
+        pass
