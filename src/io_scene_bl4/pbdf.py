@@ -31,11 +31,12 @@ def retrieve_block_size(file, file_size, key):
     file_pos = file.tell()
     checksum = 0
     while file_pos < file_size - 4:
-        dword = read_int32(file)
+        dword = read_uint32(file)
         file_pos = file.tell()
         if dword == checksum & 0xFFFFFFFF and file_size % file_pos == 0:
             return file_pos
         checksum = (checksum + (dword ^ key))
+    raise AssertionError("Could not determine PBDF block size.")
 
 
 def decrypt(in_file, out_file, key, block_size):
