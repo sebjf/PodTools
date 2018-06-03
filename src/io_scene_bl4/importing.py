@@ -1,8 +1,9 @@
 import os
 import io
+import bmesh
 import bpy
 import bpy_extras
-from .bl4 import *
+from . import bl4
 from . import pbdf
 
 
@@ -22,9 +23,6 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         description="Filepath used for importing the BL4 file",
         maxlen=1024)
 
-    def __init__(self):
-        self.circuit = None
-
     def execute(self, context):
         file_name = self.properties.filepath
         file_size = os.path.getsize(file_name)
@@ -36,9 +34,43 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 f.seek(0)
                 pbdf.decrypt(f, dec_file, key, block_size)
                 dec_file.seek(0)
-                self.circuit = Circuit.load(dec_file, key, block_size)
-        self.convert()
+                circuit = bl4.Circuit.load(dec_file, key, block_size)
+        self.convert(circuit)
         return {'FINISHED'}
 
-    def convert(self):
+    def convert(self, circuit: bl4.Circuit):
+        for i, sector in enumerate(circuit.sectors):
+            self.convert_sector(sector, "Sector{0:03d}".format(i))
+
+    def convert_textures(self):
         pass
+
+    def convert_sector(self, sector: bl4.Sector, name: str):
+        bm = bmesh.new()
+
+        # Add vertex positions (TODO: use normals with normals_split_custom_set()).
+        for position in sector.mesh.positions:
+            bm.verts.new(position)
+        bm.verts.ensure_lookup_table()
+        bm.verts.index_update()
+
+        # Create faces (provided as triangle list). Ignore duplicate faces for now (what's the deal with them?)
+        for face in sector.mesh.faces:
+            if face.vertex_count == 3:
+                verts = (bm.verts[face.indices[0]], bm.verts[face.indices[1]], bm.verts[face.indices[2]])
+            elif face.vertex_count == 4:
+                verts = (bm.verts[face.indices[0]], bm.verts[face.indices[1]], bm.verts[face.indices[2]], bm.verts[face.indices[3]])
+            else:
+                raise ValueError("Unsupported number of face vertices.")
+            try:
+                bm.faces.new(verts)
+            except ValueError as e:
+                print(e)
+
+
+        # Link the BMesh to a mesh object in the scene.
+        mesh = bpy.data.meshes.new(name)
+        bm.to_mesh(mesh)
+        bm.free()
+        obj = bpy.data.objects.new(name, mesh)
+        bpy.context.scene.objects.link(obj)

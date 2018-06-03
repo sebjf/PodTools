@@ -1,7 +1,18 @@
-from .. import pbdf
-from ..binary import *
+from . import pbdf
+from .binary import *
+from typing import *
+
 
 class Circuit:
+    def __init__(self):
+        self.events = None
+        self.macros = None
+        self.track_name = None
+        self.texture_lod = None
+        self.project_name = None
+        self.textures = None
+        self.sectors = None
+
     @classmethod
     def load(cls, file, key, block_size):
         new = cls.__new__(cls)
@@ -96,6 +107,13 @@ class TextureRegion:
 
 
 class SectorList:
+    def __init__(self):
+        self.has_named_faces = False
+        self.sectors = []
+
+    def __iter__(self):
+        return self.sectors.__iter__()
+
     @classmethod
     def load(cls, file, key):
         new = cls.__new__(cls)
@@ -105,6 +123,12 @@ class SectorList:
 
 
 class Sector:
+    def __init__(self):
+        self.mesh = None  # type: Mesh
+        self.vertex_lights = None
+        self.bounding_box_min = None
+        self.bounding_box_max = None
+
     @classmethod
     def load(cls, file, key, has_named_faces):
         new = cls.__new__(cls)
@@ -116,13 +140,19 @@ class Sector:
 
 
 class Mesh:
+    def __init__(self):
+        self.positions = None  # type: List[Tuple(float, float, float)]
+        self.faces = None  # type: List[MeshFace]
+        self.normals = None  # type: List[Tuple(float, float, float)]
+        self.unknown = None  # type: int
+
     @classmethod
     def load(cls, file, key, has_named_faces, has_unk_prop):
         new = cls.__new__(cls)
         new.positions = [read_vec3_f16x16(file) for _ in range(read_int32(file))]
         face_count = read_int32(file)
-        tri_count = read_int32(file)
-        quad_count = read_int32(file)
+        _ = read_int32(file)  # tri_count
+        _ = read_int32(file)  # quad_count
         new.faces = [MeshFace.load(file, key, has_named_faces, has_unk_prop) for _ in range(face_count)]
         new.normals = [read_vec3_f16x16(file) for _ in range(len(new.positions))]
         new.unknown = read_int32(file)  # Color?
@@ -130,6 +160,21 @@ class Mesh:
 
 
 class MeshFace:
+    def __init__(self):
+        self.name = None  # type: str
+        self.indices = None  # type: List[int, int, int, int]
+        self.vertex_count = None  # type: int
+        self.normal = None  # type: tuple(float, float, float)
+        self.material_name = None  # type: str
+        self.face_color = None
+        self.texture_index = None
+        self.texture_uvs = None
+        self.reserved = None
+        self.quad_reserved = None
+        self.unk_prop = None
+        self.properties = None
+        self.unk_reserved = None
+
     @classmethod
     def load(cls, file, key, has_name, has_unk_prop):
         new = cls.__new__(cls)
@@ -157,7 +202,7 @@ class MeshFace:
             new.quad_reserved = read_vec3_f16x16(file)
         if any(new.normal):
             if has_unk_prop:
-                new.unk_prop = read_int32(file)
+                new.unk_prop = read_int32(file)  # byte
             new.properties = read_int32(file)  # byte[3]
         else:
             new.unk_reserved = read_int32(file)
