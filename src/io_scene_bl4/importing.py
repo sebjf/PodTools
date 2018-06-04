@@ -3,6 +3,7 @@ import io
 import bmesh
 import bpy
 import bpy_extras
+from typing import *
 from . import bl4
 from . import pbdf
 
@@ -25,6 +26,7 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     def __init__(self):
         self.circuit = None  # type: bl4.Circuit
+        self.materials = []  # type: List[bpy.types.Material]
 
     def execute(self, context):
         file_name = self.properties.filepath
@@ -61,24 +63,38 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 pixels[idx + 2] = (pixel & 0b11111) / 0b11111
                 pixels[idx + 3] = 1.0
         img.pixels = pixels
-
+        # Create Cycles material.
+        mat = bpy.data.materials.new(name)
+        mat.use_nodes = True
+        nodes = mat.node_tree.nodes
+        links = mat.node_tree.links
+        texture_node = nodes.new("ShaderNodeTexImage")
+        texture_node.image = img
+        diffuse_node = nodes.get("Diffuse BSDF")
+        output_node = nodes.get("Material Output")
+        links.new(texture_node.outputs['Color'], diffuse_node.inputs['Color'])
+        links.new(diffuse_node.outputs['BSDF'], output_node.inputs['Surface'])
+        self.materials.append(mat)
 
     def convert_sector(self, sector: bl4.Sector, name: str):
-        bm = bmesh.new()
+        b_bmesh = bmesh.new()
         # Add vertex positions (TODO: use normals with normals_split_custom_set()).
         for position in sector.mesh.positions:
-            bm.verts.new(position)
-        bm.verts.ensure_lookup_table()
-        bm.verts.index_update()
-        # Create faces (provided as triangle / quad list). Ignore duplicate faces for now (apparently not required).
+            b_bmesh.verts.new(position)
+        b_bmesh.verts.ensure_lookup_table()
+        b_bmesh.verts.index_update()
+        # Create faces provided as triangle / quad list.
+        b_uv = b_bmesh.loops.layers.uv.new()
         for face in sector.mesh.faces:
             try:
-                bm.faces.new((bm.verts[face.indices[i]] for i in range(face.vertex_count)))
+                b_face = b_bmesh.faces.new((b_bmesh.verts[face.indices[i]] for i in range(face.vertex_count)))
+                for i in range(face.vertex_count):
+                    b_face.loops[i][b_uv].uv = (face.texture_uvs[i][0] / 0xFF, face.texture_uvs[i][1] / 0xFF)
             except ValueError as e:
-                print(e)
+                print(e)  # Ignore duplicate faces for now.
         # Link the BMesh to a mesh object in the scene.
-        mesh = bpy.data.meshes.new(name)
-        bm.to_mesh(mesh)
-        bm.free()
-        obj = bpy.data.objects.new(name, mesh)
-        bpy.context.scene.objects.link(obj)
+        b_mesh = bpy.data.meshes.new(name)
+        b_bmesh.to_mesh(b_mesh)
+        b_bmesh.free()
+        b_obj = bpy.data.objects.new(name, b_mesh)
+        bpy.context.scene.objects.link(b_obj)
