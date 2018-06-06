@@ -19,10 +19,8 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     bl_options = {'UNDO'}
     filename_ext = ".bl4"
     filter_glob = bpy.props.StringProperty(default="*.bl4", options={'HIDDEN'})
-    filepath = bpy.props.StringProperty(
-        name="File Path",
-        description="Filepath used for importing the BL4 file",
-        maxlen=1024)
+    filepath = bpy.props.StringProperty(name="File Path", description="Filepath used for importing the BL4 file",
+                                        maxlen=1024)
 
     def __init__(self):
         self.circuit = None  # type: bl4.Circuit
@@ -51,7 +49,7 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     def convert_texture(self, texture: bl4.Texture, name: str, size: int):
         # Create image and convert upside-down RGB565 pixel data.
-        img = bpy.data.images.new(name, width=size, height=size)
+        b_image = bpy.data.images.new(name, width=size, height=size)
         pixels = [0.0] * size * size * 4
         data = memoryview(texture.data).cast("H")
         for y in range(size):
@@ -62,19 +60,19 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 pixels[idx + 1] = (pixel >> 5 & 0b111111) / 0b111111
                 pixels[idx + 2] = (pixel & 0b11111) / 0b11111
                 pixels[idx + 3] = 1.0
-        img.pixels = pixels
+        b_image.pixels = pixels
         # Create Cycles material.
-        mat = bpy.data.materials.new(name)
-        mat.use_nodes = True
-        nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
-        texture_node = nodes.new("ShaderNodeTexImage")
-        texture_node.image = img
-        diffuse_node = nodes.get("Diffuse BSDF")
-        output_node = nodes.get("Material Output")
-        links.new(texture_node.outputs['Color'], diffuse_node.inputs['Color'])
-        links.new(diffuse_node.outputs['BSDF'], output_node.inputs['Surface'])
-        self.materials.append(mat)
+        b_material = bpy.data.materials.new(name)
+        b_material.use_nodes = True
+        b_nodes = b_material.node_tree.nodes
+        b_links = b_material.node_tree.links
+        b_texture_node = b_nodes.new("ShaderNodeTexImage")
+        b_texture_node.image = b_image
+        b_diffuse_node = b_nodes.get("Diffuse BSDF")
+        b_output_node = b_nodes.get("Material Output")
+        b_links.new(b_texture_node.outputs['Color'], b_diffuse_node.inputs['Color'])
+        b_links.new(b_diffuse_node.outputs['BSDF'], b_output_node.inputs['Surface'])
+        self.materials.append(b_material)
 
     def convert_sector(self, sector: bl4.Sector, name: str):
         b_bmesh = bmesh.new()
@@ -88,13 +86,18 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         for face in sector.mesh.faces:
             try:
                 b_face = b_bmesh.faces.new((b_bmesh.verts[face.indices[i]] for i in range(face.vertex_count)))
+                if face.material_name not in ["FLAT", "GOURAUD"]:
+                    b_face.material_index = face.texture_index
+                # Map UV from 0-255 range (Y is inverted).
                 for i in range(face.vertex_count):
-                    b_face.loops[i][b_uv].uv = (face.texture_uvs[i][0] / 0xFF, face.texture_uvs[i][1] / 0xFF)
+                    b_face.loops[i][b_uv].uv = (face.texture_uvs[i][0] / 0xFF, 0xFF - face.texture_uvs[i][1] / 0xFF)
             except ValueError as e:
                 print(e)  # Ignore duplicate faces for now.
-        # Link the BMesh to a mesh object in the scene.
+        # Write the BMesh data to a mesh object.
         b_mesh = bpy.data.meshes.new(name)
         b_bmesh.to_mesh(b_mesh)
         b_bmesh.free()
+        [b_mesh.materials.append(m) for m in self.materials]
+        # Add mesh to object and link it to scene.
         b_obj = bpy.data.objects.new(name, b_mesh)
         bpy.context.scene.objects.link(b_obj)
