@@ -15,7 +15,7 @@ bl_info = {
     "name": "UbiSoft BL4 format",
     "description": "Import-Export BL4 mesh, UV's, materials and textures",
     "author": "Syroot",
-    "version": (0, 1, 0),
+    "version": (0, 1, 1),
     "blender": (2, 79, 0),
     "location": "File > Import-Export",
     "warning": "This add-on is under development.",

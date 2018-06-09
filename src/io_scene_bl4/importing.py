@@ -43,11 +43,11 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     def convert(self):
         for i, texture in enumerate(self.circuit.textures):
-            self.convert_texture(texture, "Image{0:03d}".format(i), self.circuit.textures.size)
+            self._convert_texture(texture, "Image{0:03d}".format(i), self.circuit.textures.size)
         for i, sector in enumerate(self.circuit.sectors):
-            self.convert_sector(sector, "Sector{0:03d}".format(i))
+            self._convert_sector(sector, "Sector{0:03d}".format(i))
 
-    def convert_texture(self, texture: bl4.Texture, name: str, size: int):
+    def _convert_texture(self, texture: bl4.Texture, name: str, size: int):
         # Create image and convert upside-down RGB565 pixel data.
         b_image = bpy.data.images.new(name, width=size, height=size)
         pixels = [0.0] * size * size * 4
@@ -66,17 +66,21 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         b_material.use_nodes = True
         b_nodes = b_material.node_tree.nodes
         b_links = b_material.node_tree.links
+        b_nodes.clear()
         b_texture_node = b_nodes.new("ShaderNodeTexImage")
         b_texture_node.image = b_image
-        b_diffuse_node = b_nodes.get("Diffuse BSDF")
-        b_output_node = b_nodes.get("Material Output")
+        b_diffuse_node = b_nodes.new("ShaderNodeBsdfDiffuse")
+        b_output_node = b_nodes.new("ShaderNodeOutputMaterial")
         b_links.new(b_texture_node.outputs['Color'], b_diffuse_node.inputs['Color'])
         b_links.new(b_diffuse_node.outputs['BSDF'], b_output_node.inputs['Surface'])
         self.materials.append(b_material)
 
-    def convert_sector(self, sector: bl4.Sector, name: str):
+    def _convert_sector(self, sector: bl4.Sector, name: str):
         b_bmesh = bmesh.new()
-        # Add vertex positions (TODO: use normals with normals_split_custom_set()).
+        # Add custom face layers.
+        b_face_layer_name = b_bmesh.faces.layers.string.new("bl4_name")
+        b_face_layer_props = b_bmesh.faces.layers.int.new("bl4_props")
+        # Add vertex positions (TODO: use normals with normals_split_custom_set()?).
         for position in sector.mesh.positions:
             b_bmesh.verts.new(position)
         b_bmesh.verts.ensure_lookup_table()
@@ -86,6 +90,8 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         for face in sector.mesh.faces:
             try:
                 b_face = b_bmesh.faces.new((b_bmesh.verts[face.indices[i]] for i in range(face.vertex_count)))
+                b_face[b_face_layer_name] = face.name.encode()
+                b_face[b_face_layer_props] = face.properties
                 if face.material_name not in ["FLAT", "GOURAUD"]:
                     b_face.material_index = face.texture_index
                 # Map UV from 0-255 range (Y is inverted).
