@@ -155,7 +155,7 @@ def layer_prop_tex_level_get(self):
 def layer_prop_tex_level_set(self, value):
     new = self.bl4_layer_props
     new &= ~(0b11 << 6)
-    new |= (value & 0x11) << 6
+    new |= (value & 0b11) << 6
     self.bl4_layer_props = new
 
 
