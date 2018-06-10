@@ -8,6 +8,16 @@ from . import bl4
 from . import pbdf
 
 
+def register():
+    bpy.types.INFO_MT_file_import.append(menu_func_import)
+    bpy.types.INFO_MT_window.append(menu_func_import)
+
+
+def unregister():
+    bpy.types.INFO_MT_file_import.remove(menu_func_import)
+    bpy.types.INFO_MT_window.remove(menu_func_import)
+
+
 def menu_func_import(self, context):
     self.layout.operator(ImportOperator.bl_idname, text="UbiSoft BL4 (.bl4)")
 
