@@ -14,18 +14,28 @@ def register():
     bpy.utils.register_class(BL4AddNameLayerOperator)
     bpy.utils.register_class(BL4AddPropsLayerOperator)
     bpy.app.handlers.scene_update_post.append(scene_update_post_handler)
-    WindowManager.bl4_layer_name = StringProperty(name="Name", update=layer_name_update)
-    WindowManager.bl4_layer_props = IntProperty(name="Props", update=layer_props_update)
+    WindowManager.bl4_layer_name = StringProperty(name="Name",
+                                                  update=layer_name_update)
+    WindowManager.bl4_layer_props = IntProperty(name="Props",
+                                                default=0, min=0,
+                                                update=layer_props_update)
     WindowManager.bl4_layer_prop_visible = BoolProperty(name="Visible",
                                                         get=layer_prop_visible_get, set=layer_prop_visible_set)
     WindowManager.bl4_layer_prop_road = BoolProperty(name="Road",
                                                      get=layer_prop_road_get, set=layer_prop_road_set)
     WindowManager.bl4_layer_prop_wall = BoolProperty(name="Wall",
                                                      get=layer_prop_wall_get, set=layer_prop_wall_set)
+    WindowManager.bl4_layer_prop_deco = BoolProperty(name="Decoration", description="Marks the polygon as unsolid decoration",
+                                                     get=layer_prop_deco_get, set=layer_prop_deco_set)
     WindowManager.bl4_layer_prop_black = BoolProperty(name="Transparent", description="Renders black as transparency",
                                                       get=layer_prop_black_get, set=layer_prop_black_set)
     WindowManager.bl4_layer_prop_2side = BoolProperty(name="2-sided", description="Renders the polygon from both sides",
                                                       get=layer_prop_2side_get, set=layer_prop_2side_set)
+    WindowManager.bl4_layer_prop_dural = BoolProperty(name="Dural", description="Renders a metallic-like texture",
+                                                      get=layer_prop_dural_get, set=layer_prop_dural_set)
+    WindowManager.bl4_layer_prop_slip = IntProperty(name="Slipperyness",
+                                                    default=0, min=0, max=255,
+                                                    get=layer_prop_slip_get, set=layer_prop_slip_set)
 
 
 def unregister():
@@ -38,6 +48,11 @@ def unregister():
     del WindowManager.bl4_layer_prop_visible
     del WindowManager.bl4_layer_prop_road
     del WindowManager.bl4_layer_prop_wall
+    del WindowManager.bl4_layer_prop_deco
+    del WindowManager.bl4_layer_prop_black
+    del WindowManager.bl4_layer_prop_2side
+    del WindowManager.bl4_layer_prop_dural
+    del WindowManager.bl4_layer_prop_slip
 
 
 @bpy.app.handlers.persistent
@@ -114,6 +129,17 @@ def layer_prop_wall_set(self, value):
         self.bl4_layer_props &= ~0b100000
 
 
+def layer_prop_deco_get(self):
+    return self.bl4_layer_props & 0b10000000 != 0
+
+
+def layer_prop_deco_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b10000000
+    else:
+        self.bl4_layer_props &= ~0b10000000
+
+
 def layer_prop_black_get(self):
     return self.bl4_layer_props & 0b100000000 != 0
 
@@ -136,6 +162,28 @@ def layer_prop_2side_set(self, value):
         self.bl4_layer_props &= ~0b10000000000
 
 
+def layer_prop_dural_get(self):
+    return self.bl4_layer_props & 0b10000000000000 != 0
+
+
+def layer_prop_dural_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b10000000000000
+    else:
+        self.bl4_layer_props &= ~0b10000000000000
+
+
+def layer_prop_slip_get(self):
+    return self.bl4_layer_props >> 16 & 0xFF
+
+
+def layer_prop_slip_set(self, value):
+    new = self.bl4_layer_props
+    new &= ~(0xFF << 16)
+    new |= (value & 0xFF) << 16
+    self.bl4_layer_props = new
+
+
 class BL4EditPanel(Panel):
     bl_label = "UbiSoft BL4"
     bl_region_type = 'UI'
@@ -156,13 +204,18 @@ class BL4EditPanel(Panel):
         # Draw props layer.
         layer = current_bm.faces.layers.int.get(BL4_LAYER_PROPS)
         if layer:
-            self.layout.prop(wm, "bl4_layer_prop_visible")
             row = self.layout.row()
             row.prop(wm, "bl4_layer_prop_road")
             row.prop(wm, "bl4_layer_prop_wall")
+            self.layout.prop(wm, "bl4_layer_prop_deco")
+            self.layout.prop(wm, "bl4_layer_prop_slip")
+            row = self.layout.row()
+            row.prop(wm, "bl4_layer_prop_visible")
+            row.prop(wm, "bl4_layer_prop_2side")
             row = self.layout.row()
             row.prop(wm, "bl4_layer_prop_black")
-            row.prop(wm, "bl4_layer_prop_2side")
+            row.prop(wm, "bl4_layer_prop_dural")
+            # DEBUG
             self.layout.label("Flag Debug")
             self.layout.prop(wm, "bl4_layer_props")
             self.layout.label(format(wm.bl4_layer_props >> 24 & 0xFF, "#010b"))

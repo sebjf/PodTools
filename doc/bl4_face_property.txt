@@ -1,16 +1,16 @@
-00000000 000000!! 0000020B #%W0R00V
+00000000 SSSSSSSS 00D0020B F%W0R00V
 
 V = Is Visible
 R = Is Road
 W = Is Wall
 % = ? seen with walls
-# = ? seen with unsolid polygons
-B = Is Black Transparent
-2 = Is Two Faced Texture (no culling)
-! = ? seen with slipperyness, probably up to 8 bits
+F = Decoration (explicitly unsolid)
+B = Black is transparent
+2 = Two faced texture, no culling
+D = Dural effect
+S = Slipperyness
   = Animated Texture Data
   = Reflect zones 0-7
-  = Dural effect
 
 00000000 00000000 00000000 01100000 (0x60) = Invisible Wall
 00000000 00000000 00000000 01100001 (0x61) = Visible Wall
