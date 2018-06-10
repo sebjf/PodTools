@@ -186,4 +186,4 @@ def write_header_offsets(file, block_size, offsets, data_size):
 def read_string(file):
     return bytes(
         (c ^ ~i) & 0xFF for i, c in enumerate(file.read(read_byte(file)))
-    ).decode("cp1252")
+    ).decode("cp437")  # May be cp1252, but some fan made tracks have borked strings requiring a safe CP.
