@@ -1,10 +1,10 @@
-00000000 SSSSSSSS 00D0020B F%W0R00V
+00000000 SSSSSSSS 00D0020B GGW0R00V
 
 V = Is Visible
 R = Is Road
 W = Is Wall
 % = ? seen with walls
-F = Decoration (explicitly unsolid)
+G = Graphic level (higher means less textured if graphics low)
 B = Black is transparent
 2 = Two faced texture, no culling
 D = Dural effect

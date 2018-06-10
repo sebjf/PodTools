@@ -15,25 +15,44 @@ def register():
     bpy.utils.register_class(BL4AddPropsLayerOperator)
     bpy.app.handlers.scene_update_post.append(scene_update_post_handler)
     WindowManager.bl4_layer_name = StringProperty(name="Name",
+                                                  description="The internal name of this face. Has no effect in-game",
                                                   update=layer_name_update)
     WindowManager.bl4_layer_props = IntProperty(name="Props",
+                                                description="The resulting flags integer",
                                                 default=0, min=0,
                                                 update=layer_props_update)
     WindowManager.bl4_layer_prop_visible = BoolProperty(name="Visible",
+                                                        description="If unchecked, this face will not be rendered",
                                                         get=layer_prop_visible_get, set=layer_prop_visible_set)
     WindowManager.bl4_layer_prop_road = BoolProperty(name="Road",
+                                                     description="Applies road physics, making it possible to "
+                                                                 "accelerate on this surface",
                                                      get=layer_prop_road_get, set=layer_prop_road_set)
     WindowManager.bl4_layer_prop_wall = BoolProperty(name="Wall",
+                                                     description="Applies wall physics, making it impossible to "
+                                                                 "accelerate on this surface",
                                                      get=layer_prop_wall_get, set=layer_prop_wall_set)
-    WindowManager.bl4_layer_prop_deco = BoolProperty(name="Decoration", description="Marks the polygon as unsolid decoration",
-                                                     get=layer_prop_deco_get, set=layer_prop_deco_set)
-    WindowManager.bl4_layer_prop_black = BoolProperty(name="Transparent", description="Renders black as transparency",
+    WindowManager.bl4_layer_prop_tex_level = IntProperty(name="Graphic Level",
+                                                         description="The required graphic level at which a texture "
+                                                                     "will be drawn instead of a replacement color. "
+                                                                     "Not handled by all graphics backends (notably "
+                                                                     "3dfx). 0 always draws the texture",
+                                                         default=0, min=0, max=3,
+                                                         get=layer_prop_tex_level_get, set=layer_prop_tex_level_set)
+    WindowManager.bl4_layer_prop_black = BoolProperty(name="Transparent",
+                                                      description="When enabled, black color will not be drawn to "
+                                                                  "enable transparent parts",
                                                       get=layer_prop_black_get, set=layer_prop_black_set)
-    WindowManager.bl4_layer_prop_2side = BoolProperty(name="2-sided", description="Renders the polygon from both sides",
+    WindowManager.bl4_layer_prop_2side = BoolProperty(name="2-sided",
+                                                      description="Renders the polygon from both sides",
                                                       get=layer_prop_2side_get, set=layer_prop_2side_set)
-    WindowManager.bl4_layer_prop_dural = BoolProperty(name="Dural", description="Renders a metallic-like texture",
+    WindowManager.bl4_layer_prop_dural = BoolProperty(name="Dural",
+                                                      description="Renders a metallic texture like the one applied to "
+                                                                  "the player car when the DURAL cheat was entered",
                                                       get=layer_prop_dural_get, set=layer_prop_dural_set)
     WindowManager.bl4_layer_prop_slip = IntProperty(name="Slipperyness",
+                                                    description="The amount of friction on this surface. 0 for default"
+                                                                "friction (full steering control)",
                                                     default=0, min=0, max=255,
                                                     get=layer_prop_slip_get, set=layer_prop_slip_set)
 
@@ -129,15 +148,15 @@ def layer_prop_wall_set(self, value):
         self.bl4_layer_props &= ~0b100000
 
 
-def layer_prop_deco_get(self):
-    return self.bl4_layer_props & 0b10000000 != 0
+def layer_prop_tex_level_get(self):
+    return self.bl4_layer_props >> 6 & 0b11
 
 
-def layer_prop_deco_set(self, value):
-    if value:
-        self.bl4_layer_props |= 0b10000000
-    else:
-        self.bl4_layer_props &= ~0b10000000
+def layer_prop_tex_level_set(self, value):
+    new = self.bl4_layer_props
+    new &= ~(0b11 << 6)
+    new |= (value & 0x11) << 6
+    self.bl4_layer_props = new
 
 
 def layer_prop_black_get(self):
@@ -207,7 +226,6 @@ class BL4EditPanel(Panel):
             row = self.layout.row()
             row.prop(wm, "bl4_layer_prop_road")
             row.prop(wm, "bl4_layer_prop_wall")
-            self.layout.prop(wm, "bl4_layer_prop_deco")
             self.layout.prop(wm, "bl4_layer_prop_slip")
             row = self.layout.row()
             row.prop(wm, "bl4_layer_prop_visible")
@@ -215,6 +233,7 @@ class BL4EditPanel(Panel):
             row = self.layout.row()
             row.prop(wm, "bl4_layer_prop_black")
             row.prop(wm, "bl4_layer_prop_dural")
+            self.layout.prop(wm, "bl4_layer_prop_tex_level")
             # DEBUG
             self.layout.label("Flag Debug")
             self.layout.prop(wm, "bl4_layer_props")
