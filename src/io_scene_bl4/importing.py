@@ -9,13 +9,15 @@ from . import pbdf
 
 
 def register():
+    bpy.utils.register_class(ImportOperator)
     bpy.types.INFO_MT_file_import.append(menu_func_import)
-    bpy.types.INFO_MT_window.append(menu_func_import)
+    bpy.types.INFO_MT_window.append(menu_func_import)  # DEBUG
 
 
 def unregister():
+    bpy.utils.unregister_class(ImportOperator)
     bpy.types.INFO_MT_file_import.remove(menu_func_import)
-    bpy.types.INFO_MT_window.remove(menu_func_import)
+    bpy.types.INFO_MT_window.remove(menu_func_import)  # DEBUG
 
 
 def menu_func_import(self, context):
