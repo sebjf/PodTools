@@ -203,8 +203,8 @@ class MeshFace:
         self.indices = None  # type: List[int, int, int, int]
         self.vertex_count = None  # type: int
         self.normal = None  # type: tuple(float, float, float)
-        self.material_name = None  # type: str
-        self.face_color = None  # type: int
+        self.material_type = None  # type: str
+        self.color = None  # type: int
         self.texture_index = None  # type: int
         self.texture_uvs = None  # type: List[Tuple(float, float, float)]
         self.reserved = None  # type: int
@@ -229,13 +229,13 @@ class MeshFace:
             new.vertex_count = read_int32(file)
             new.indices = read_int32s(file, 4)
         new.normal = read_vec3_f16x16(file)
-        new.material_name = pbdf.read_string(file)
-        if new.material_name in ["FLAT", "GOURAUD"]:
-            new.face_color = read_int32(file)
+        new.material_type = pbdf.read_string(file)
+        if new.material_type in ["FLAT", "GOURAUD"]:
+            new.color = read_uint32(file)  # RGBX
         else:
             new.texture_index = read_int32(file)
         new.texture_uvs = [read_vec2_uint32(file) for _ in range(4)]
-        new.reserved = read_int32(file)  # Color?
+        new.reserved = read_int32(file)
         if new.vertex_count == 4:
             new.quad_reserved = read_vec3_f16x16(file)
         if any(new.normal):

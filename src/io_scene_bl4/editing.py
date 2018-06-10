@@ -29,8 +29,14 @@ def unregister():
 def scene_update_post_handler(scene):
     global current_bm, ignore_layer_update
     if bpy.context.mode == 'EDIT_MESH':
+        # Get the current BMesh instance.
         current_bm = current_bm or bmesh.from_edit_mesh(bpy.context.object.data)
-        active_face = current_bm.faces.active
+        try:
+            active_face = current_bm.faces.active
+        except ReferenceError:  # BMesh instance changed
+            current_bm = bmesh.from_edit_mesh(bpy.context.object.data)
+            active_face = current_bm.faces.active
+        # Update the displayed properties according to selected faces.
         if active_face:
             ignore_layer_update = True
             layer = current_bm.faces.layers.string.get(BL4_LAYER_NAME)

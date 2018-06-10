@@ -10,6 +10,34 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
+            EncryptAllTracks();
+            //ReEncryptAllTracks();
+        }
+
+        private static void EncryptAllTracks()
+        {
+            string decFolder = @"D:\Pictures\Circuits";
+            string encFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
+
+            Directory.CreateDirectory(decFolder);
+            Directory.CreateDirectory(encFolder);
+
+            foreach (string decFilePath in Directory.GetFiles(decFolder, "*.dec.bl4"))
+            {
+                string fileName = Path.GetFileName(decFilePath);
+                string encFilePath = Path.Combine(encFolder, fileName.Replace("dec.bl4", "bl4"));
+
+                Console.WriteLine($"Updating {encFilePath}...");
+                using (FileStream decFile = new FileStream(decFilePath, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (FileStream encFile = new FileStream(encFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    Pbdf.Encrypt(decFile, encFile, 0x00000F7E, 0x00004000);
+                }
+            }
+        }
+
+        private static void ReEncryptAllTracks()
+        {
             string circuitFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup";
             string decFolder = @"D:\Pictures\Circuits";
             string encFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";

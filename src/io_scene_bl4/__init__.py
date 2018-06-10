@@ -2,6 +2,7 @@ import importlib
 import bpy
 from . import binary
 from . import bl4
+from . import btools
 from . import editing
 from . import importing
 from . import pbdf
@@ -9,6 +10,7 @@ from . import pbdf
 # Reload modules when reloading add-ons in Blender with F8.
 importlib.reload(binary)
 importlib.reload(bl4)
+importlib.reload(btools)
 importlib.reload(editing)
 importlib.reload(importing)
 importlib.reload(pbdf)

@@ -6,7 +6,6 @@ from .binary import *
 
 def retrieve_key(file, file_size):
     """Retrieves the XOR encryption key from the given file.
-
     Args:
         file: The encrypted input file.
         file_size (int): The size of the input file in bytes.
@@ -19,7 +18,6 @@ def retrieve_key(file, file_size):
 
 def retrieve_block_size(file, file_size, key):
     """Retrieves the size of blocks the given file is using.
-
     Args:
         file: The encrypted input file.
         file_size (int): The size of the input file in bytes.
@@ -41,7 +39,6 @@ def retrieve_block_size(file, file_size, key):
 
 def decrypt(in_file, out_file, key, block_size):
     """Decrypts the data in the input file and writes it to the output file.
-
     Args:
         in_file: The encrypted input file.
         out_file: The output file receiving the decrypted content.
@@ -96,7 +93,6 @@ def decrypt(in_file, out_file, key, block_size):
 
 def encrypt(in_file, out_file, key, block_size):
     """Encrypts the data in the input file and writes it to the output file.
-
     Args:
         in_file: The decrypted input file.
         out_file: The output file receiving the encrypted content.
@@ -149,13 +145,11 @@ def encrypt(in_file, out_file, key, block_size):
 
 
 def read_header_offsets(file, block_size):
-    """Reads the PBDF header (not checking the included file size) and returns the list of offsets
-    adjusted to match decrypted data positions.
-
+    """Reads the PBDF header (not checking the included file size) and returns the list of offsets adjusted to match
+    decrypted data positions.
     Args:
         file: The decrypted input file.
         block_size (int): The block size in bytes at which end a checksum is placed.
-
     Returns:
         The list of offsets, adjusted to point to decrypted file positions.
     """
@@ -169,13 +163,11 @@ def read_header_offsets(file, block_size):
 
 def write_header_offsets(file, block_size, offsets, data_size):
     """Writes the PBDF file header with adjusted offsets to point to encrypted data positions.
-
     Args:
         file: The file to write the header to.
         block_size (int): The block size in bytes at which end a checksum is placed.
         offsets: The list of offsets which will be adjusted to point to encrypted data positions.
         data_size: The size of the file data (excluding the header) in bytes.
-
     """
     header_size = (2 + len(offsets)) * 4  # file_size + num_offsets + offsets
     file_size = header_size + data_size
