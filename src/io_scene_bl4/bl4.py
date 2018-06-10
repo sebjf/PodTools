@@ -230,7 +230,7 @@ class MeshFace:
             new.indices = read_int32s(file, 4)
         new.normal = read_vec3_f16x16(file)
         new.material_type = pbdf.read_string(file)
-        if new.material_type in ["FLAT", "GOURAUD"]:
+        if new.material_type in ('FLAT', 'GOURAUD'):
             new.color = read_uint32(file)  # RGBX
         else:
             new.texture_index = read_int32(file)

@@ -1,5 +1,7 @@
 import bpy
 import bmesh
+from bpy.props import BoolProperty, IntProperty, StringProperty
+from bpy.types import Operator, Panel, WindowManager
 
 BL4_LAYER_NAME = "bl4_name"
 BL4_LAYER_PROPS = "bl4_props"
@@ -12,8 +14,18 @@ def register():
     bpy.utils.register_class(BL4AddNameLayerOperator)
     bpy.utils.register_class(BL4AddPropsLayerOperator)
     bpy.app.handlers.scene_update_post.append(scene_update_post_handler)
-    bpy.types.WindowManager.bl4_layer_name = bpy.props.StringProperty(name="Name", update=layer_name_update)
-    bpy.types.WindowManager.bl4_layer_props = bpy.props.IntProperty(name="Props", update=layer_props_update)
+    WindowManager.bl4_layer_name = StringProperty(name="Name", update=layer_name_update)
+    WindowManager.bl4_layer_props = IntProperty(name="Props", update=layer_props_update)
+    WindowManager.bl4_layer_prop_visible = BoolProperty(name="Visible",
+                                                        get=layer_prop_visible_get, set=layer_prop_visible_set)
+    WindowManager.bl4_layer_prop_road = BoolProperty(name="Road",
+                                                     get=layer_prop_road_get, set=layer_prop_road_set)
+    WindowManager.bl4_layer_prop_wall = BoolProperty(name="Wall",
+                                                     get=layer_prop_wall_get, set=layer_prop_wall_set)
+    WindowManager.bl4_layer_prop_black = BoolProperty(name="Transparent", description="Renders black as transparency",
+                                                      get=layer_prop_black_get, set=layer_prop_black_set)
+    WindowManager.bl4_layer_prop_2side = BoolProperty(name="2-sided", description="Renders the polygon from both sides",
+                                                      get=layer_prop_2side_get, set=layer_prop_2side_set)
 
 
 def unregister():
@@ -21,8 +33,11 @@ def unregister():
     bpy.utils.unregister_class(BL4AddNameLayerOperator)
     bpy.utils.unregister_class(BL4AddPropsLayerOperator)
     bpy.app.handlers.scene_update_post.remove(scene_update_post_handler)
-    del bpy.types.WindowManager.bl4_layer_name
-    del bpy.types.WindowManager.bl4_layer_props
+    del WindowManager.bl4_layer_name
+    del WindowManager.bl4_layer_props
+    del WindowManager.bl4_layer_prop_visible
+    del WindowManager.bl4_layer_prop_road
+    del WindowManager.bl4_layer_prop_wall
 
 
 @bpy.app.handlers.persistent
@@ -66,7 +81,62 @@ def layer_props_update(self, context):
             face[layer] = self.bl4_layer_props
 
 
-class BL4EditPanel(bpy.types.Panel):
+def layer_prop_visible_get(self):
+    return self.bl4_layer_props & 0b1 != 0
+
+
+def layer_prop_visible_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b1
+    else:
+        self.bl4_layer_props &= ~0b1
+
+
+def layer_prop_road_get(self):
+    return self.bl4_layer_props & 0b1000 != 0
+
+
+def layer_prop_road_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b1000
+    else:
+        self.bl4_layer_props &= ~0b1000
+
+
+def layer_prop_wall_get(self):
+    return self.bl4_layer_props & 0b100000 != 0
+
+
+def layer_prop_wall_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b100000
+    else:
+        self.bl4_layer_props &= ~0b100000
+
+
+def layer_prop_black_get(self):
+    return self.bl4_layer_props & 0b100000000 != 0
+
+
+def layer_prop_black_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b100000000
+    else:
+        self.bl4_layer_props &= ~0b100000000
+
+
+def layer_prop_2side_get(self):
+    return self.bl4_layer_props & 0b10000000000 != 0
+
+
+def layer_prop_2side_set(self, value):
+    if value:
+        self.bl4_layer_props |= 0b10000000000
+    else:
+        self.bl4_layer_props &= ~0b10000000000
+
+
+class BL4EditPanel(Panel):
     bl_label = "UbiSoft BL4"
     bl_region_type = 'UI'
     bl_space_type = 'VIEW_3D'
@@ -78,22 +148,32 @@ class BL4EditPanel(bpy.types.Panel):
     def draw(self, context):
         wm = context.window_manager
         # Draw name layer.
-        row = self.layout.row()
         layer = current_bm.faces.layers.string.get(BL4_LAYER_NAME)
         if layer:
             self.layout.prop(wm, "bl4_layer_name")
         else:
-            row.operator(BL4AddNameLayerOperator.bl_idname)
+            self.layout.operator(BL4AddNameLayerOperator.bl_idname)
         # Draw props layer.
-        row = self.layout.row()
         layer = current_bm.faces.layers.int.get(BL4_LAYER_PROPS)
         if layer:
+            self.layout.prop(wm, "bl4_layer_prop_visible")
+            row = self.layout.row()
+            row.prop(wm, "bl4_layer_prop_road")
+            row.prop(wm, "bl4_layer_prop_wall")
+            row = self.layout.row()
+            row.prop(wm, "bl4_layer_prop_black")
+            row.prop(wm, "bl4_layer_prop_2side")
+            self.layout.label("Flag Debug")
             self.layout.prop(wm, "bl4_layer_props")
+            self.layout.label(format(wm.bl4_layer_props >> 24 & 0xFF, "#010b"))
+            self.layout.label(format(wm.bl4_layer_props >> 16 & 0xFF, "#010b"))
+            self.layout.label(format(wm.bl4_layer_props >> 8 & 0xFF, "#010b"))
+            self.layout.label(format(wm.bl4_layer_props & 0xFF, "#010b"))
         else:
-            row.operator(BL4AddPropsLayerOperator.bl_idname)
+            self.layout.operator(BL4AddPropsLayerOperator.bl_idname)
 
 
-class BL4AddNameLayerOperator(bpy.types.Operator):
+class BL4AddNameLayerOperator(Operator):
     bl_idname = "mesh.add_bl4_face_name_layer"
     bl_label = "Add name layer"
 
@@ -109,7 +189,7 @@ class BL4AddNameLayerOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class BL4AddPropsLayerOperator(bpy.types.Operator):
+class BL4AddPropsLayerOperator(Operator):
     bl_idname = "mesh.add_bl4_face_props_layer"
     bl_label = "Add properties layer"
 

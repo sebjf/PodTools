@@ -3,7 +3,6 @@ import io
 import bmesh
 import bpy
 import bpy_extras
-import mathutils
 from typing import *
 from . import bl4
 from . import btools
@@ -33,9 +32,6 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     bl_options = {'UNDO'}
     filename_ext = ".bl4"
     filter_glob = bpy.props.StringProperty(default="*.bl4", options={'HIDDEN'})
-    filepath = bpy.props.StringProperty(name="File Path",
-                                        description="Filepath used for importing the BL4 file",
-                                        maxlen=1024)
 
     def __init__(self):
         self.circuit = None  # type: bl4.Circuit
@@ -96,31 +92,33 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         for face in sector.mesh.faces:
             try:
                 b_face = b_bmesh.faces.new((b_bmesh.verts[face.indices[i]] for i in range(face.vertex_count)))
-                b_face[b_face_layer_name] = face.name.encode()
-                b_face[b_face_layer_props] = face.properties
-                if face.material_type in ['FLAT', 'GOURAUD']:
-                    # Get an already appended color material or create and append it to the mesh.
-                    material_index = self.color_mat_indices.get(face.color)
-                    if material_index:
-                        b_face.material_index = material_index
-                    else:
-                        r = face.color >> 16 & 0xFF
-                        g = face.color >> 8 & 0xFF
-                        b = face.color & 0xFF
-                        mat_name = "Color_{}_{}_{}".format(r, g, b)
-                        mat = btools.create_color_material(mat_name, (r / 0xFF, g / 0xFF, b / 0xFF, 1))
-                        index = len(self.mats)
-                        b_mesh.materials.append(mat)
-                        b_face.material_index = index
-                        self.mats.append(mat)
-                        self.color_mat_indices[face.color] = index
-                else:
-                    b_face.material_index = face.texture_index
-                # Map UV from 0-255 range (Y is inverted).
-                for i in range(face.vertex_count):
-                    b_face.loops[i][b_uv].uv = (face.texture_uvs[i][0] / 0xFF, 0xFF - face.texture_uvs[i][1] / 0xFF)
             except ValueError as e:
                 print(e)  # Ignore duplicate faces for now.
+                continue
+            b_face[b_face_layer_name] = face.name.encode()
+            b_face[b_face_layer_props] = face.properties
+            # TODO: Optimize setting materials, only append those needed by the sector.
+            if face.material_type in ('FLAT', 'GOURAUD'):
+                # Get an already appended color material or create and append it to the mesh.
+                material_index = self.color_mat_indices.get(face.color)
+                if material_index:
+                    b_face.material_index = material_index
+                else:
+                    r = face.color >> 16 & 0xFF
+                    g = face.color >> 8 & 0xFF
+                    b = face.color & 0xFF
+                    mat_name = "Color_{}_{}_{}".format(r, g, b)
+                    b_mat = btools.create_color_material(mat_name, (r / 0xFF, g / 0xFF, b / 0xFF, 1))
+                    index = len(self.mats)
+                    b_mesh.materials.append(b_mat)
+                    b_face.material_index = index
+                    self.mats.append(b_mat)
+                    self.color_mat_indices[face.color] = index
+            else:
+                b_face.material_index = face.texture_index
+            # Map UV from 0-255 range (Y is inverted).
+            for i in range(face.vertex_count):
+                b_face.loops[i][b_uv].uv = (face.texture_uvs[i][0] / 0xFF, 0xFF - face.texture_uvs[i][1] / 0xFF)
         # Write the BMesh data to the mesh, add it to an object and link it to the scene.
         b_bmesh.to_mesh(b_mesh)
         b_bmesh.free()

@@ -1,13 +1,13 @@
-00000000 000000!! 0000020B #?W0R00V
+00000000 000000!! 0000020B #%W0R00V
 
-! = ? seen with slipperyness, probably up to 8 bits
-2 = No Culling (Is Two Faced Texture) (untested)
-B = Is Black Transparent (untested)
-# = ? seen with unsolid polygons
-? = ? seen with walls
-W = Is Wall
-R = Is Road
 V = Is Visible
+R = Is Road
+W = Is Wall
+% = ? seen with walls
+# = ? seen with unsolid polygons
+B = Is Black Transparent
+2 = Is Two Faced Texture (no culling)
+! = ? seen with slipperyness, probably up to 8 bits
   = Animated Texture Data
   = Reflect zones 0-7
   = Dural effect
