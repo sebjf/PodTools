@@ -73,6 +73,7 @@ class ImportOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 pixels[idx + 2] = (pixel & 0b11111) / 0b11111
                 pixels[idx + 3] = 1
         b_image.pixels = pixels
+        b_image.pack(as_png=True)
         self.mats.append(btools.create_texture_material(name, b_image))
 
     def _convert_sector(self, sector: bl4.Sector, name: str):
