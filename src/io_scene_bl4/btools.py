@@ -14,7 +14,7 @@ def create_empty_material(name: str, render_engine: str = None):
 
     material = bpy.data.materials.new(name)
 
-    if render_engine == 'BLENDER_RENDER':
+    if render_engine in ('BLENDER_RENDER', 'BLENDER_GAME'):
         material.diffuse_intensity = 1
         material.specular_intensity = 0
 
@@ -41,7 +41,7 @@ def create_texture_material(name: str, image: bpy.types.Image, render_engine: st
 
     material = create_empty_material(name, render_engine)
 
-    if render_engine == 'BLENDER_RENDER':
+    if render_engine in ('BLENDER_RENDER', 'BLENDER_GAME'):
         tex = bpy.data.textures.new(name, type = 'IMAGE')
         tex.image = image
 
@@ -79,7 +79,7 @@ def create_color_material(name: str, color: Tuple[float, float, float, float], r
 
     material = create_empty_material(name, render_engine)
 
-    if render_engine == 'BLENDER_RENDER':
+    if render_engine in ('BLENDER_RENDER', 'BLENDER_GAME'):
         material.diffuse_color = color[:3]
 
     elif render_engine == 'CYCLES':
