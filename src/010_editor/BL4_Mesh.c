@@ -36,7 +36,7 @@ typedef struct(uint hasName, bool hasUnkNormalProperty) // MeshFace
 	else
 		uint idxTexture;
 	Vector2U textureUV[4];
-	uint reserved; // Color?
+	uint reserved1; // Color?
 	if (numFaceVertex == 4)
 		Vector3F16x16 quadReserved;
 	if (normal.x || normal.y || normal.z)
@@ -47,7 +47,7 @@ typedef struct(uint hasName, bool hasUnkNormalProperty) // MeshFace
 	}
 	else
 	{
-		uint reserved;
+		uint reserved2;
 	}
 } MeshFace <read = MeshFaceRead>;
 string MeshFaceRead(MeshFace& value)

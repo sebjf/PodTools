@@ -1,5 +1,5 @@
-struct EnvironmentList; struct Environment;
-struct EnvironmentObject; struct EnvironmentInstance; struct EnvironmentSectorInstanceList; struct EnvironmentObjectContacts;
+struct EnvironmentList;
+struct Decoration; struct DecorationContact; struct DecorationInstance; struct DecorationSectorInstanceList;
 
 typedef struct // EnvironmentList
 {
@@ -8,11 +8,11 @@ typedef struct // EnvironmentList
 	{
 		uint numMacro;
 		if (numMacro) Macro macros(3)[numMacro] <optimize = true>;
-		uint numEnvironment;
-		Environment environments[numEnvironment] <optimize = false>;
+		uint numDecorations;
+		Decoration decorations[numDecorations] <optimize = false>;
 		uint numInstance;
-		EnvironmentInstance instances[numInstance] <optimize = true>;
-		EnvironmentSectorInstanceList sectorInstances[circuit.sectorList.num] <optimize = false>;
+		DecorationInstance instances[numInstance] <optimize = true>;
+		DecorationSectorInstanceList sectorInstances[circuit.sectorList.num] <optimize = false>;
 	}
 } EnvironmentList <read = EnvironmentListRead>;
 string EnvironmentListRead(EnvironmentList& value)
@@ -20,15 +20,10 @@ string EnvironmentListRead(EnvironmentList& value)
 	return PbdfStringRead(value.fileName);
 }
 
-typedef struct // Environment
+typedef struct // Decoration
 {
-	PbdfString name;
-	EnvironmentObject object;
-} Environment;
-
-typedef struct // EnvironmentObject
-{
-	PbdfString name;
+	PbdfString decorationName;
+	PbdfString objectName;
 	TextureList textures(128, 128, 2); // RGB565
 	uint hasNamedFaces;
 	Mesh mesh(hasNamedFaces, false);
@@ -40,25 +35,25 @@ typedef struct // EnvironmentObject
 	uint unknown3;
 	uint unknown4;
 	uint numContacts;
-	EnvironmentObjectContacts contacts[numContacts];
-} EnvironmentObject;
+	DecorationContact contacts[numContacts];
+} Decoration;
 
-typedef struct // EnvironmentInstance
+typedef struct // DecorationContact
+{
+	ubyte data[64];
+} DecorationContact;
+
+typedef struct // DecorationInstance
 {
 	uint idx;
 	uint numVectors;
 	if (numVectors) Vector2U vectors[numVectors];
 	Vector3F16x16 position;
 	Matrix3x3F16x16 rotation;
-} EnvironmentInstance;
+} DecorationInstance;
 
-typedef struct // EnvironmentSectorInstanceList
+typedef struct // DecorationSectorInstanceList
 {
 	uint num;
-	if (num) EnvironmentInstance instances[num] <optimize = true>;
-} EnvironmentSectorInstanceList;
-
-typedef struct // EnvironmentObjectContacts
-{
-	ubyte contacts[64];
-} EnvironmentObjectContacts;
+	if (num) DecorationInstance instances[num] <optimize = true>;
+} DecorationSectorInstanceList;
