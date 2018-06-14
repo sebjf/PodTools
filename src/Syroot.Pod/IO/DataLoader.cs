@@ -64,7 +64,7 @@ namespace Syroot.Pod.IO
         /// Loads and returns <paramref name="count"/> instances <see cref="IData{T}"/> instances.
         /// </summary>
         /// <typeparam name="TData">The type of the <see cref="IData{T}"/> to load.</typeparam>
-        /// /// <param name="parameter">The optional parameter to pass in to all loading instances.</param>
+        /// <param name="parameter">The optional parameter to pass in to all loading instances.</param>
         /// <returns>The loaded instances.</returns>
         public IEnumerable<TData> LoadMany<TData>(int count, object parameter = null)
             where TData : IData<T>, new()

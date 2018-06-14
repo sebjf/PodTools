@@ -54,7 +54,8 @@ namespace Syroot.Pod.Circuits
         public bool HasNamedSectorFaces { get; set; }
         public IList<Sector> Sectors { get; set; }
         public IList<Visibility> Visibilities { get; set; }
-        public Environ Environment { get; set; }
+        public EnvironmentSection Environment { get; set; }
+        public LightSection Lights { get; set; }
 
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
@@ -99,7 +100,8 @@ namespace Syroot.Pod.Circuits
             HasNamedSectorFaces = loader.ReadBoolean(BooleanCoding.Dword);
             Sectors = loader.LoadMany<Sector>(loader.ReadInt32()).ToList();
             Visibilities = loader.LoadMany<Visibility>(loader.ReadInt32()).ToList();
-            Environment = loader.Load<Environ>();
+            Environment = loader.LoadSection<EnvironmentSection>();
+            Lights = loader.LoadSection<LightSection>();
         }
     }
 }
