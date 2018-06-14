@@ -1,4 +1,4 @@
-00000000 SSSSSSSS 00D0020B GGW0R00V
+xxxxxxxx SSSSSSSS 00D0020B GGW0R00V
 
 V = Visible
 R = Road
@@ -10,3 +10,4 @@ D = Dural effect
 S = Slipperyness level
   = Animated Texture Data?
   = Reflect zones 0-7?
+x = not used
