@@ -1,7 +1,7 @@
 struct EnvironmentList;
 struct Decoration; struct DecorationContact; struct DecorationInstance; struct DecorationSectorInstanceList;
 
-typedef struct // EnvironmentList
+typedef struct // Environment
 {
 	PbdfString fileName;
 	if (!PbdfStringCompare(fileName, "NEANT"))
@@ -14,8 +14,8 @@ typedef struct // EnvironmentList
 		DecorationInstance instances[numInstance] <optimize = true>;
 		DecorationSectorInstanceList sectorInstances[circuit.sectorList.num] <optimize = false>;
 	}
-} EnvironmentList <read = EnvironmentListRead>;
-string EnvironmentListRead(EnvironmentList& value)
+} Environment <read = EnvironmentRead>;
+string EnvironmentRead(Environment& value)
 {
 	return PbdfStringRead(value.fileName);
 }

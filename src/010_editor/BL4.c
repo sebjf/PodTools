@@ -22,13 +22,13 @@
 #include "BL4_Environment.c"
 #include "BL4_Light.c"
 #include "BL4_Animation1.c"
-#include "BL4_Sound.c";
-#include "BL4_Background.c";
-#include "BL4_Animation2.c";
-#include "BL4_RepairZone.c";
-#include "BL4_Designation.c";
-#include "BL4_Difficulty.c";
-#include "BL4_Competitor.c";
+#include "BL4_Sound.c"
+#include "BL4_Background.c"
+#include "BL4_Animation2.c"
+#include "BL4_RepairZone.c"
+#include "BL4_Designation.c"
+#include "BL4_Difficulty.c"
+#include "BL4_Competitor.c"
 
 typedef struct // Circuit
 {
@@ -43,7 +43,7 @@ typedef struct // Circuit
 	TextureList textureList(256, 256, 2); // RGB565
 	SectorList sectorList <bgcolor = 0xCDCDFF>;
 	VisibleList visibleList <bgcolor = 0xBDBDEB>;
-	EnvironmentList environmentList <bgcolor = 0xEFCDFF>;
+	Environment environment <bgcolor = 0xEFCDFF>;
 	LightSectorList lightSectorList <bgcolor = 0xFFCDEF>;
 	Animation1List animation1List <bgcolor = 0xFFCDCD>;
 	SoundList soundList <bgcolor = 0xFFD6CD>;

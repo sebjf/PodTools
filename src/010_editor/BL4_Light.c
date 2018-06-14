@@ -7,7 +7,7 @@ typedef struct // LightSectorList
 	{
 		uint num;
 		uint value1;
-		uint value2[3];
+		Vector3U value2;
 		uint value3;
 		uint value4;
 		uint value5;
