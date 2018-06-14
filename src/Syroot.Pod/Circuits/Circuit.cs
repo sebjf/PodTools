@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Syroot.BinaryData;
-using Syroot.Maths;
 using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Circuits
@@ -11,16 +10,12 @@ namespace Syroot.Pod.Circuits
     /// <summary>
     /// Represents BL4 files.
     /// </summary>
-    public class Circuit : PbdfFile
+    public class Circuit : PbdfFile, IData<Circuit>
     {
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
         private const int _blockSize = 0x00004000;
         private const uint _key = 0x00000F7E;
-
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private byte[] _unparsedData;
 
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
@@ -45,7 +40,6 @@ namespace Syroot.Pod.Circuits
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         public IList<Event> Events { get; set; }
-
         public IList<Macro> MacrosBase { get; set; }
         public IList<Macro> Macros { get; set; }
         public IList<Macro> MacrosInit { get; set; }
@@ -56,29 +50,17 @@ namespace Syroot.Pod.Circuits
         public string TrackName { get; set; }
         public IList<uint> LevelOfDetail { get; set; }
         public string ProjectName { get; set; }
-        public IList<Texture> Textures { get; set; }
-        public Model Model { get; set; }
+        public TextureList Textures { get; set; }
+        public bool HasNamedSectorFaces { get; set; }
+        public IList<Sector> Sectors { get; set; }
         public IList<Visibility> Visibilities { get; set; }
+        public Environ Environment { get; set; }
 
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
         protected override void LoadData(Stream stream)
         {
-            uint checksum = stream.ReadUInt32(); // must be 3
-            uint reserved = stream.ReadUInt32(); // not used
-
-            LoadEvents(stream);
-            LoadMacros(stream);
-
-            TrackName = stream.ReadPodString();
-            LevelOfDetail = stream.ReadUInt32s(16);
-            ProjectName = stream.ReadPodString();
-
-            LoadTextures(stream);
-            LoadModel(stream);
-            LoadVisibilities(stream);
-
-            _unparsedData = stream.ReadBytes((int)(stream.Length - stream.Position));
+            new DataLoader<Circuit>(stream, this).Execute();
         }
 
         protected override void SaveData(Stream stream)
@@ -88,180 +70,36 @@ namespace Syroot.Pod.Circuits
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
-        private void LoadEvents(Stream stream)
+        private void LoadEventAndMacros(DataLoader<Circuit> loader)
         {
-            int count = stream.ReadInt32();
-            uint bufferSize = stream.ReadUInt32();
+            int count = loader.ReadInt32();
+            uint bufferSize = loader.ReadUInt32();
+            Events = loader.LoadMany<Event>(count).ToList();
 
-            Events = new List<Event>(count);
-            while (count-- > 0)
-            {
-                Event evnt = new Event();
-                Events.Add(evnt);
-
-                evnt.Name = stream.ReadPodString();
-                uint paramSize = stream.ReadUInt32();
-                int paramCount = stream.ReadInt32();
-                evnt.ParamData = new byte[paramSize][];
-                for (int i = 0; i < paramSize; i++)
-                    evnt.ParamData[i] = stream.ReadBytes(paramCount);
-            }
+            MacrosBase = loader.LoadMany<Macro>(loader.ReadInt32(), 3).ToList();
+            Macros = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
+            MacrosInit = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
+            MacrosActive = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
+            MacrosInactive = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
+            MacrosReplace = loader.LoadMany<Macro>(loader.ReadInt32(), 2).ToList();
+            MacrosExchange = loader.LoadMany<Macro>(loader.ReadInt32(), 2).ToList();
         }
 
-        private void LoadMacros(Stream stream)
+        // ---- METHODS ------------------------------------------------------------------------------------------------
+
+        void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            int countBase = stream.ReadInt32();
-            MacrosBase = new List<Macro>(countBase);
-            while (countBase-- > 0)
-                MacrosBase.Add(new Macro(stream.ReadUInt32s(3)));
-
-            int count = stream.ReadInt32();
-            Macros = new List<Macro>(count);
-            while (count-- > 0)
-                Macros.Add(new Macro(stream.ReadUInt32s(1)));
-
-            int countInit = stream.ReadInt32();
-            MacrosInit = new List<Macro>(countInit);
-            while (countInit-- > 0)
-                MacrosInit.Add(new Macro(stream.ReadUInt32s(1)));
-
-            int countActive = stream.ReadInt32();
-            MacrosActive = new List<Macro>(countActive);
-            while (countActive-- > 0)
-                MacrosActive.Add(new Macro(stream.ReadUInt32s(1)));
-
-            int countInactive = stream.ReadInt32();
-            MacrosInactive = new List<Macro>(countInactive);
-            while (countInactive-- > 0)
-                MacrosInactive.Add(new Macro(stream.ReadUInt32s(1)));
-
-            int countReplace = stream.ReadInt32();
-            MacrosReplace = new List<Macro>(countReplace);
-            while (countReplace-- > 0)
-                MacrosReplace.Add(new Macro(stream.ReadUInt32s(2)));
-
-            int countExchange = stream.ReadInt32();
-            MacrosExchange = new List<Macro>(countExchange);
-            while (countExchange-- > 0)
-                MacrosExchange.Add(new Macro(stream.ReadUInt32s(2)));
-        }
-
-        private void LoadTextures(Stream stream)
-        {
-            int count = stream.ReadInt32();
-            uint reserved3 = stream.ReadUInt32();
-
-            Textures = new List<Texture>(count);
-            while (count-- > 0)
-            {
-                Texture texture = new Texture();
-                Textures.Add(texture);
-
-                // Read areas.
-                int areaCount = stream.ReadInt32();
-                texture.Areas = new List<TextureArea>(areaCount);
-                while (areaCount-- > 0)
-                {
-                    texture.Areas.Add(new TextureArea
-                    {
-                        Name = stream.ReadFixedString(32),
-                        Left = stream.ReadUInt32(),
-                        Top = stream.ReadUInt32(),
-                        Right = stream.ReadUInt32(),
-                        Bottom = stream.ReadUInt32(),
-                        Index = stream.ReadUInt32()
-                    });
-                }
-            }
-            foreach (Texture texture in Textures)
-                texture.Data = stream.ReadUInt16s(256 * 256);
-        }
-
-        private void LoadModel(Stream stream)
-        {
-            Model = new Model();
-            Model.HasNamedFaces = stream.ReadBoolean(BooleanCoding.Dword);
-
-            // Read meshes.
-            int count = stream.ReadInt32();
-            Model.Meshes = new List<Mesh>(count);
-            while (count-- > 0)
-            {
-                Mesh mesh = new Mesh();
-                Model.Meshes.Add(mesh);
-
-                int vertexCount = stream.ReadInt32();
-                mesh.Positions = stream.ReadMany(vertexCount, () => stream.ReadVector3U());
-                int faceCount = stream.ReadInt32();
-                int triCount = stream.ReadInt32();
-                int quadCount = stream.ReadInt32();
-
-                // Read faces.
-                mesh.Faces = new List<Face>(faceCount);
-                while (faceCount-- > 0)
-                {
-                    Face face = new Face();
-                    mesh.Faces.Add(face);
-
-                    if (Model.HasNamedFaces)
-                        face.Name = stream.ReadPodString();
-
-                    uint faceVertexCount; // Warning: Not stored with face
-                    if (Key == 0x00005CA8)
-                    {
-                        face.Indices[3] = stream.ReadUInt32();
-                        face.Indices[0] = stream.ReadUInt32();
-                        faceVertexCount = stream.ReadUInt32();
-                        face.Indices[2] = stream.ReadUInt32();
-                        face.Indices[1] = stream.ReadUInt32();
-                    }
-                    else
-                    {
-                        faceVertexCount = stream.ReadUInt32();
-                        for (int i = 0; i < 4; i++)
-                            face.Indices[i] = stream.ReadUInt32();
-                    }
-
-                    face.Normal = stream.ReadVector3F16x16();
-                    face.MaterialType = stream.ReadPodString();
-                    face.ColorOrTexIndex = stream.ReadUInt32();
-                    for (int i = 0; i < 4; i++)
-                        face.TexCoords[i] = stream.ReadVector2U();
-                    face.Reserved = stream.ReadUInt32();
-                    if (faceVertexCount == 4)
-                        face.QuadReserved = stream.ReadVector3F16x16();
-                    if (face.Normal == Vector3U.Zero)
-                    {
-                        // invalid
-                        face.Reserved = stream.ReadUInt32(); // Warning: overriding Reserved from above
-                    }
-                    else
-                    {
-                        face.Unknown = stream.ReadUInt32();
-                        face.Properties = stream.ReadUInt32();
-                    }
-                }
-
-                mesh.Normals = stream.ReadMany(vertexCount, () => stream.ReadVector3F16x16());
-                mesh.Unknown = stream.ReadUInt32();
-
-                mesh.VertexLights = stream.ReadBytes(vertexCount);
-                mesh.BoundingBoxMin = stream.ReadVector3F16x16();
-                mesh.BoundingBoxMax = stream.ReadVector3F16x16();
-            }
-        }
-
-        private void LoadVisibilities(Stream stream)
-        {
-            int count = stream.ReadInt32();
-            Visibilities = new List<Visibility>(count);
-
-            while (count-- > 0)
-            {
-                Visibility visibility = new Visibility();
-                Visibilities.Add(visibility);
-                visibility.VisibleMeshes = stream.ReadUInt32s(Math.Max(0, stream.ReadInt32())).ToList();
-            }
+            uint checksum = loader.ReadUInt32(); // must be 3
+            uint reserved = loader.ReadUInt32(); // not used
+            LoadEventAndMacros(loader);
+            TrackName = loader.ReadPodString();
+            LevelOfDetail = loader.ReadUInt32s(16);
+            ProjectName = loader.ReadPodString();
+            Textures = loader.Load<TextureList>(256);
+            HasNamedSectorFaces = loader.ReadBoolean(BooleanCoding.Dword);
+            Sectors = loader.LoadMany<Sector>(loader.ReadInt32()).ToList();
+            Visibilities = loader.LoadMany<Visibility>(loader.ReadInt32()).ToList();
+            Environment = loader.Load<Environ>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Syroot.Pod.Circuits;
 using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Scratchpad
@@ -10,8 +11,22 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
-            EncryptAllTracks();
+            LoadAllTracks();
+            //EncryptAllTracks();
             //ReEncryptAllTracks();
+        }
+
+        private static void LoadAllTracks()
+        {
+            string folder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
+            foreach (string filePath in Directory.GetFiles(folder, "*.bl4"))
+            {
+                Console.WriteLine($"Loading {Path.GetFileName(filePath)}...");
+                using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    Circuit circuit = new Circuit(file);
+                }
+            }
         }
 
         private static void EncryptAllTracks()

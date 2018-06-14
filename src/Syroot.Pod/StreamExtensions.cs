@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using Syroot.BinaryData;
 using Syroot.Maths;
-using Syroot.Pod.Circuits;
 
 namespace Syroot.Pod
 {
@@ -25,6 +24,14 @@ namespace Syroot.Pod
             if (readBytes < length)
                 throw new InvalidDataException("Incomplete fixed string.");
             return (encoding ?? Encoding.ASCII).GetString(buffer).TrimEnd(_fixedStringTerminator);
+        }
+
+        internal static Matrix3 ReadMatrix3F16x16(this Stream self)
+        {
+            return new Matrix3(
+                ReadSingle16x16(self), ReadSingle16x16(self), ReadSingle16x16(self),
+                ReadSingle16x16(self), ReadSingle16x16(self), ReadSingle16x16(self),
+                ReadSingle16x16(self), ReadSingle16x16(self), ReadSingle16x16(self));
         }
 
         internal static string ReadPodString(this Stream self)
