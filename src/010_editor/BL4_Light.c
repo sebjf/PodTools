@@ -1,6 +1,6 @@
 struct LightSectorList; struct LightSector; struct Light;
 
-typedef struct // LightSectorList
+typedef struct // LightSection
 {
 	PbdfString fileName;
 	if (!PbdfStringCompare(fileName, "NEANT"))
@@ -19,8 +19,8 @@ typedef struct // LightSectorList
 			LightSector globalLightSector;
 		LightSector lightSectors[num] <optimize = false>;
 	}
-} LightSectorList <read = LightSectorListRead>;
-string LightSectorListRead(LightSectorList& value)
+} LightSection <read = LightSectionRead>;
+string LightSectionRead(LightSection& value)
 {
 	return PbdfStringRead(value.fileName);
 }

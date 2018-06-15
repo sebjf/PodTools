@@ -43,9 +43,9 @@ typedef struct // Circuit
 	TextureList textureList(256, 256, 2); // RGB565
 	SectorList sectorList <bgcolor = 0xCDCDFF>;
 	VisibleList visibleList <bgcolor = 0xBDBDEB>;
-	Environment environment <bgcolor = 0xEFCDFF>;
-	LightSectorList lightSectorList <bgcolor = 0xFFCDEF>;
-	Animation1List animation1List <bgcolor = 0xFFCDCD>;
+	EnvironmentSection environment <bgcolor = 0xEFCDFF>;
+	LightSection lights <bgcolor = 0xFFCDEF>;
+	Animation1Section animation1s <bgcolor = 0xFFCDCD>;
 	SoundList soundList <bgcolor = 0xFFD6CD>;
 	Background background <bgcolor = 0xFFEFCD>;
 	Sky sky <bgcolor = 0xEBDCBD>;
