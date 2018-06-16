@@ -29,7 +29,7 @@ namespace Syroot.Pod.Circuits
             where T : ISectionData, new()
         {
             string name = self.ReadPodString();
-            if (String.Compare(name, _noneName, true, CultureInfo.InvariantCulture) == 0)
+            if (name == String.Empty || String.Compare(name, _noneName, true, CultureInfo.InvariantCulture) == 0)
             {
                 return default;
             }

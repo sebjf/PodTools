@@ -53,21 +53,19 @@ typedef struct // Circuit
 	RepairZoneList repairZoneList <bgcolor = 0xFFEFCD>;
 
 	Designation designationForward <bgcolor = 0xEFFFCD>;
-	Difficulty diffForward <bgcolor = 0xCDFFCD>;
-	DifficultyLevel diffLevelForwardEasy <bgcolor = 0xCDFFCD>;
+	Difficulty diffLevelForwardEasy <bgcolor = 0xCDFFCD>;
 	PbdfSeekOffset(1);
-	DifficultyLevel diffLevelForwardNormal <bgcolor = 0xCDFFCD>;
+	Difficulty diffLevelForwardNormal <bgcolor = 0xCDFFCD>;
 	PbdfSeekOffset(2);
-	DifficultyLevel diffLevelForwardHard <bgcolor = 0xCDFFCD>;
+	Difficulty diffLevelForwardHard <bgcolor = 0xCDFFCD>;
 
 	PbdfSeekOffset(3);
 	Designation designationReverse <bgcolor = 0xEFFFCD>;
-	Difficulty diffReverse <bgcolor = 0xCDFFCD>;
-	DifficultyLevel diffLevelReverseEasy <bgcolor = 0xCDFFCD>;
+	Difficulty diffLevelReverseEasy <bgcolor = 0xCDFFCD>;
 	PbdfSeekOffset(4);
-	DifficultyLevel diffLevelReverseMedium <bgcolor = 0xCDFFCD>;
+	Difficulty diffLevelReverseNormal <bgcolor = 0xCDFFCD>;
 	PbdfSeekOffset(5);
-	DifficultyLevel diffLevelReverseHard <bgcolor = 0xCDFFCD>;
+	Difficulty diffLevelReverseHard <bgcolor = 0xCDFFCD>;
 
 	PbdfSeekOffset(6);
 	CompetitorList competitorListEasy <bgcolor = 0xCDFFEF>;

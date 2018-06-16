@@ -29,6 +29,11 @@ typedef struct
 	if (numPhaseMacros) Macro phaseMacros(3)[numPhaseMacros] <optimize = true>;
 	uint numPhase;
 	if (numPhase) DesignationPhase phases[numPhase] <optimize = false>;
+	uint numStartPoint;
+	struct StartPoint
+	{
+		ubyte data[36];
+	} startPoints[numStartPoint];
 } Designation <read = DesignationRead>;
 string DesignationRead(Designation& value)
 {

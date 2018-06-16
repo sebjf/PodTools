@@ -35,6 +35,8 @@ namespace Syroot.Pod.Circuits
 
         public IList<DesignationPhase> Phases { get; set; }
 
+        public IList<DesignationStart> Starts { get; set; }
+
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
@@ -52,6 +54,7 @@ namespace Syroot.Pod.Circuits
             MacroSection = loader.LoadSection<DesignationMacroSection>();
             PhaseMacros = loader.LoadMany<Macro>(loader.ReadInt32(), 3).ToList();
             Phases = loader.LoadMany<DesignationPhase>(loader.ReadInt32()).ToList();
+            Starts = loader.LoadMany<DesignationStart>(loader.ReadInt32()).ToList();
         }
     }
 }

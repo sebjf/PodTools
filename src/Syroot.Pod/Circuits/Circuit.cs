@@ -87,6 +87,20 @@ namespace Syroot.Pod.Circuits
 
         public Designation DesignationForward { get; set; }
 
+        public Difficulty DifficultyForwardEasy { get; set; }
+
+        public Difficulty DifficultyForwardNormal { get; set; }
+
+        public Difficulty DifficultyForwardHard { get; set; }
+
+        public Designation DesignationReverse { get; set; }
+
+        public Difficulty DifficultyReverseEasy { get; set; }
+
+        public Difficulty DifficultyReverseNormal { get; set; }
+
+        public Difficulty DifficultyReverseHard { get; set; }
+
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
         protected override void LoadData(Stream stream)
@@ -142,10 +156,43 @@ namespace Syroot.Pod.Circuits
 
             // Load forward specifications.
             DesignationForward = loader.Load<Designation>();
+            DifficultyForwardEasy = loader.Load<Difficulty>();
+            loader.Position = Offsets[(int)Offset.DifficultyForwardNormal];
+            DifficultyForwardNormal = loader.Load<Difficulty>();
+            loader.Position = Offsets[(int)Offset.DifficultyForwardHard];
+            DifficultyForwardHard = loader.Load<Difficulty>();
 
             // Load reverse specifications.
+            loader.Position = Offsets[(int)Offset.DesignationReverse];
+            DesignationReverse = loader.Load<Designation>();
+            DifficultyReverseEasy = loader.Load<Difficulty>();
+            loader.Position = Offsets[(int)Offset.DifficultyReverseNormal];
+            DifficultyReverseNormal = loader.Load<Difficulty>();
+            loader.Position = Offsets[(int)Offset.DifficultyReverseHard];
+            DifficultyReverseHard = loader.Load<Difficulty>();
 
             // Load competitors.
+            loader.Position = Offsets[(int)Offset.CompetitorsEasy];
+
+            loader.Position = Offsets[(int)Offset.CompetitorsNormal];
+
+            loader.Position = Offsets[(int)Offset.CompetitorsHard];
+
+        }
+
+        // ---- CLASSES, STRUCTS & ENUMS -------------------------------------------------------------------------------
+
+        private enum Offset
+        {
+            Default,
+            DifficultyForwardNormal,
+            DifficultyForwardHard,
+            DesignationReverse,
+            DifficultyReverseNormal,
+            DifficultyReverseHard,
+            CompetitorsEasy,
+            CompetitorsNormal,
+            CompetitorsHard
         }
     }
 }

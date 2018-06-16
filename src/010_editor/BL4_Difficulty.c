@@ -1,32 +1,23 @@
 typedef struct // Difficulty
 {
-	uint numStartPoint;
-	struct StartPoint
-	{
-		ubyte data[36];
-	} startPoints[numStartPoint];
-} Difficulty;
-
-typedef struct // DifficultyLevel
-{
 	PbdfString difficultyName;
 	PbdfString fileName;
 	if (!PbdfStringCompare(fileName, "NEANT"))
 	{
 		uint numPosition; // Enr_Positions
 		Vector3F16x16 positions[numPosition];
-		uint numSection;
-		struct Section
+		uint numPath;
+		struct Path
 		{
-			uint numTrack;
-			struct Track
+			uint numPoint;
+			struct Point
 			{
 				uint value4; // ushort
 				uint value5; // ushort
 				uint idxPosition;
 				uint value7;
-			} tracks[numTrack] <optimize = true>;
-		} sections[numSection] <optimize = false>;
+			} points[numPoint] <optimize = true>;
+		} paths[numPath] <optimize = false>;
 		PbdfString name;
 		if (name.decData == "PLANS CONTRAINTES")
 		{
@@ -77,8 +68,8 @@ typedef struct // DifficultyLevel
 			} subCs[numSubC] <optimize = true>;
 		}
 	}
-} DifficultyLevel <read = DifficultyLevelRead>;
-string DifficultyLevelRead(DifficultyLevel& value)
+} Difficulty <read = DifficultyRead>;
+string DifficultyRead(Difficulty& value)
 {
 	return PbdfStringRead(value.difficultyName);
 }

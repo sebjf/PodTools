@@ -11,6 +11,7 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
+            Circuit circuit = new Circuit(@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Test.bl4");
             LoadAllTracks();
             //EncryptAllTracks();
             //ReEncryptAllTracks();
@@ -21,6 +22,10 @@ namespace Syroot.Pod.Scratchpad
             string folder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
             foreach (string filePath in Directory.GetFiles(folder, "*.bl4"))
             {
+                // Partly broken files.
+                if (filePath.Contains("Arcade++") || filePath.Contains("Forest"))
+                    continue;
+
                 Console.WriteLine($"Loading {Path.GetFileName(filePath)}...");
                 using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
