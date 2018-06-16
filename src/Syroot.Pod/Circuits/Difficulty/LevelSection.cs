@@ -1,45 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Syroot.BinaryData;
-using Syroot.Maths;
 using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Circuits
 {
     public class LevelSection : ISectionData
     {
-        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
-
-        private const string _plansContraintesName = "PLANS CONTRAINTES";
-
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         public string Name { get; set; }
 
-        public IList<Vector3F> Positions { get; set; }
+        public int Unknown1 { get; set; }
 
-        public IList<IList<LevelPoint>> Paths { get; set; }
+        public int Unknown2 { get; set; }
 
-        public string ConstraintName { get; set; }
+        public IList<LevelConfig1> LevelConfig1s { get; set; }
 
-        public IList<LevelConstraint> Constraints { get; set; }
+        public IList<LevelConfig2> LevelConfig2s { get; set; }
+
+        public IList<LevelConfig3> LevelConfig3s { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            Positions = loader.ReadMany(loader.ReadInt32(), () => loader.ReadVector3F16x16());
-
-            int pathCount = loader.ReadInt32();
-            Paths = new List<IList<LevelPoint>>(pathCount);
-            while (pathCount-- > 0)
-                Paths.Add(loader.LoadMany<LevelPoint>(loader.ReadInt32()).ToList());
-
-            ConstraintName = loader.ReadPodString();
-            if (String.Compare(ConstraintName, _plansContraintesName, true, CultureInfo.InvariantCulture) == 0)
-                loader.LoadMany<LevelConstraint>(loader.ReadInt32()).ToList();
+            Unknown1 = loader.ReadInt32();
+            int levelConfig1Count = loader.ReadInt32();
+            int levelConfig2Count = loader.ReadInt32();
+            int levelConfig3Count = loader.ReadInt32();
+            Unknown2 = loader.ReadInt32();
+            LevelConfig1s = loader.LoadMany<LevelConfig1>(levelConfig1Count).ToList();
+            LevelConfig2s = loader.LoadMany<LevelConfig2>(levelConfig2Count).ToList();
+            LevelConfig3s = loader.LoadMany<LevelConfig3>(levelConfig3Count).ToList();
         }
     }
 }

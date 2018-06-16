@@ -40,19 +40,12 @@ namespace Syroot.Pod.Circuits
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         public IList<Event> Events { get; set; }
-
         public IList<Macro> MacrosBase { get; set; }
-
         public IList<Macro> Macros { get; set; }
-
         public IList<Macro> MacrosInit { get; set; }
-
         public IList<Macro> MacrosActive { get; set; }
-
         public IList<Macro> MacrosInactive { get; set; }
-
         public IList<Macro> MacrosReplace { get; set; }
-
         public IList<Macro> MacrosExchange { get; set; }
 
         public string TrackName { get; set; }
@@ -87,19 +80,28 @@ namespace Syroot.Pod.Circuits
 
         public Designation DesignationForward { get; set; }
 
-        public Difficulty DifficultyForwardEasy { get; set; }
+        public DifficultySection DifficultyForwardEasy { get; set; }
+        public LevelSection LevelForwardEasy { get; set; } 
 
-        public Difficulty DifficultyForwardNormal { get; set; }
+        public DifficultySection DifficultyForwardNormal { get; set; }
+        public LevelSection LevelForwardNormal { get; set; }
 
-        public Difficulty DifficultyForwardHard { get; set; }
+        public DifficultySection DifficultyForwardHard { get; set; }
+        public LevelSection LevelForwardHard { get; set; }
 
         public Designation DesignationReverse { get; set; }
+        public DifficultySection DifficultyReverseEasy { get; set; }
+        public LevelSection LevelReverseEasy { get; set; }
 
-        public Difficulty DifficultyReverseEasy { get; set; }
+        public DifficultySection DifficultyReverseNormal { get; set; }
+        public LevelSection LevelReverseNormal { get; set; }
 
-        public Difficulty DifficultyReverseNormal { get; set; }
+        public DifficultySection DifficultyReverseHard { get; set; }
+        public LevelSection LevelReverseHard { get; set; }
 
-        public Difficulty DifficultyReverseHard { get; set; }
+        public CompetitorSection CompetitorsEasy { get; set; }
+        public CompetitorSection CompetitorsNormal { get; set; }
+        public CompetitorSection CompetitorsHard { get; set; }
 
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
@@ -156,28 +158,40 @@ namespace Syroot.Pod.Circuits
 
             // Load forward specifications.
             DesignationForward = loader.Load<Designation>();
-            DifficultyForwardEasy = loader.Load<Difficulty>();
+
+            DifficultyForwardEasy = loader.LoadDifficultySection<DifficultySection>();
+            LevelForwardEasy = loader.LoadSection<LevelSection>();
+
             loader.Position = Offsets[(int)Offset.DifficultyForwardNormal];
-            DifficultyForwardNormal = loader.Load<Difficulty>();
+            DifficultyForwardNormal = loader.LoadDifficultySection<DifficultySection>();
+            LevelForwardNormal = loader.LoadSection<LevelSection>();
+
             loader.Position = Offsets[(int)Offset.DifficultyForwardHard];
-            DifficultyForwardHard = loader.Load<Difficulty>();
+            DifficultyForwardHard = loader.LoadDifficultySection<DifficultySection>();
+            LevelForwardHard = loader.LoadSection<LevelSection>();
 
             // Load reverse specifications.
             loader.Position = Offsets[(int)Offset.DesignationReverse];
             DesignationReverse = loader.Load<Designation>();
-            DifficultyReverseEasy = loader.Load<Difficulty>();
+
+            DifficultyReverseEasy = loader.LoadDifficultySection<DifficultySection>();
+            LevelReverseEasy = loader.LoadSection<LevelSection>();
+
             loader.Position = Offsets[(int)Offset.DifficultyReverseNormal];
-            DifficultyReverseNormal = loader.Load<Difficulty>();
+            DifficultyReverseNormal = loader.LoadDifficultySection<DifficultySection>();
+            LevelReverseNormal = loader.LoadSection<LevelSection>();
+
             loader.Position = Offsets[(int)Offset.DifficultyReverseHard];
-            DifficultyReverseHard = loader.Load<Difficulty>();
+            DifficultyReverseHard = loader.LoadDifficultySection<DifficultySection>();
+            LevelReverseHard = loader.LoadSection<LevelSection>();
 
             // Load competitors.
             loader.Position = Offsets[(int)Offset.CompetitorsEasy];
-
+            CompetitorsEasy = loader.LoadDifficultySection<CompetitorSection>();
             loader.Position = Offsets[(int)Offset.CompetitorsNormal];
-
+            CompetitorsNormal = loader.LoadDifficultySection<CompetitorSection>();
             loader.Position = Offsets[(int)Offset.CompetitorsHard];
-
+            CompetitorsHard = loader.LoadDifficultySection<CompetitorSection>();
         }
 
         // ---- CLASSES, STRUCTS & ENUMS -------------------------------------------------------------------------------

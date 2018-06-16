@@ -41,5 +41,32 @@ namespace Syroot.Pod.Circuits
                 return data;
             }
         }
+
+        /// <summary>
+        /// Loads an <see cref="IDifficultySectionData"/> instance of type <typeparamref name="T"/>, returning
+        /// <c>null</c> if the name is "NEANT".
+        /// </summary>
+        /// <typeparam name="T">The type of the <see cref="IDifficultySectionData"/> to load.</typeparam>
+        /// <param name="self">The extended <see cref="DataLoader{T}"/> instance.</param>
+        /// <param name="parameter">The optional parameter to pass in to the loading instance.</param>
+        /// <returns>The loaded difficulty section instance or <see langword="null"/> if the name was "NEANT".</returns>
+        public static T LoadDifficultySection<T>(this DataLoader<Circuit> self, object parameter = null)
+            where T : IDifficultySectionData, new()
+        {
+            string difficultyName = self.ReadPodString();
+            string name = self.ReadPodString();
+            if (name == String.Empty || String.Compare(name, _noneName, true, CultureInfo.InvariantCulture) == 0)
+            {
+                return default;
+            }
+            else
+            {
+                T data = new T();
+                data.DifficultyName = difficultyName;
+                data.Name = name;
+                data.Load(self, parameter);
+                return data;
+            }
+        }
     }
 }

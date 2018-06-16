@@ -1,25 +1,25 @@
-﻿using Syroot.BinaryData;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Syroot.BinaryData;
 using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Circuits
 {
-    public class LevelConstraint : IData<Circuit>
+    public class CompetitorSection : IDifficultySectionData
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
-        public int DesignationIndex { get; set; }
+        public string DifficultyName { get; set; }
 
-        public int Unknown1 { get; set; }
+        public string Name { get; set; }
 
-        public int Unknown2 { get; set; }
+        public IList<Competitor> Competitors { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            DesignationIndex = loader.ReadInt32();
-            Unknown1 = loader.ReadInt32();
-            Unknown2 = loader.ReadInt32();
+            Competitors = loader.LoadMany<Competitor>(loader.ReadInt32()).ToList();
         }
     }
 }

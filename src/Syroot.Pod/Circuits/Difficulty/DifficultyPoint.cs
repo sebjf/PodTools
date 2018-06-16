@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using Syroot.BinaryData;
+﻿using Syroot.BinaryData;
 using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Circuits
 {
-    public class DifficultyConfig2 : IData<Circuit>
+    public class DifficultyPoint : IData<Circuit>
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -12,11 +11,9 @@ namespace Syroot.Pod.Circuits
 
         public int Unknown2 { get; set; }
 
-        public IList<int> Unknown3 { get; set; }
+        public int PositionIndex { get; set; }
 
-        public int Unknown4 { get; set; }
-
-        public IList<int> Unknown5 { get; set; }
+        public int Unknown3 { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
@@ -24,9 +21,8 @@ namespace Syroot.Pod.Circuits
         {
             Unknown1 = loader.ReadInt32();
             Unknown2 = loader.ReadInt32();
-            Unknown3 = loader.ReadInt32s(loader.ReadInt32());
-            Unknown4 = loader.ReadInt32();
-            Unknown5 = loader.ReadInt32s(loader.ReadInt32());
+            PositionIndex = loader.ReadInt32();
+            Unknown3 = loader.ReadInt32();
         }
     }
 }
