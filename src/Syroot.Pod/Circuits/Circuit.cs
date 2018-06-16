@@ -85,6 +85,8 @@ namespace Syroot.Pod.Circuits
 
         public RepairZoneSection RepairZoneSection { get; set; }
 
+        public Designation DesignationForward { get; set; }
+
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
         protected override void LoadData(Stream stream)
@@ -118,6 +120,7 @@ namespace Syroot.Pod.Circuits
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
+            // Load general data.
             uint checksum = loader.ReadUInt32(); // must be 3
             uint reserved = loader.ReadUInt32(); // not used
             LoadEventAndMacros(loader);
@@ -135,7 +138,14 @@ namespace Syroot.Pod.Circuits
             Background = loader.Load<Background>();
             Sky = loader.Load<Sky>();
             Anim2Sections = loader.Load<Anim2SectionList>();
-            RepairZoneSection = loader.Load<RepairZoneSection>();
+            RepairZoneSection = loader.LoadSection<RepairZoneSection>();
+
+            // Load forward specifications.
+            DesignationForward = loader.Load<Designation>();
+
+            // Load reverse specifications.
+
+            // Load competitors.
         }
     }
 }

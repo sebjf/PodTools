@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Syroot.Pod.IO
@@ -7,13 +8,11 @@ namespace Syroot.Pod.IO
     /// Represents a generic data loader which passes the constructed instance to all <see cref="IData{T}"/> instances.
     /// </summary>
     /// <typeparam name="T">The type of the constructed instance.</typeparam>
+    [DebuggerDisplay("{GetType().Name,nq}  Position={Position}")]
+    [DebuggerStepThrough]
     public class DataLoader<T> : StreamWrapper
         where T : IData<T>
     {
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private readonly Stream _stream;
-
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
@@ -25,7 +24,6 @@ namespace Syroot.Pod.IO
         public DataLoader(Stream stream, T instance)
             : base(stream)
         {
-            _stream = stream;
             Instance = instance;
         }
 

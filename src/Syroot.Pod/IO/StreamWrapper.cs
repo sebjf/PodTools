@@ -1,10 +1,13 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 
 namespace Syroot.Pod.IO
 {
     /// <summary>
     /// Represents a non-abstract <see cref="Stream"/> implementation wrapping a given stream instance.
     /// </summary>
+    [DebuggerDisplay("{BaseStream} (wrapped)")]
+    [DebuggerStepThrough]
     public class StreamWrapper : Stream
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------

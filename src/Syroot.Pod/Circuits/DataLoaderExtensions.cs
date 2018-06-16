@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using Syroot.Pod.IO;
 
@@ -7,6 +8,7 @@ namespace Syroot.Pod.Circuits
     /// <summary>
     /// Represents extension methods for <see cref="DataLoader{Circuit}"/> instances.
     /// </summary>
+    [DebuggerStepThrough]
     public static class DataLoaderExtensions
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
