@@ -31,7 +31,7 @@ namespace Syroot.Pod.Circuits
         /// Gets or sets the list of <see cref="Anim1TextureFrame"/> instances which animate each texture by an
         /// <see cref="Anim1TextureFrameKey"/>.
         /// </summary>
-        public IList<Anim1TextureFrame> Frames { get; set; }
+        public IList<Anim1TextureFrame> Keys { get; set; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ namespace Syroot.Pod.Circuits
             Name = loader.ReadPodString();
             Textures = loader.Load<TextureList>(256);
             Configs = loader.LoadMany<Anim1TextureConfig>(configCount).ToList();
-            Frames = loader.LoadMany<Anim1TextureFrame>(frameCount).ToList();
+            Keys = loader.LoadMany<Anim1TextureFrame>(frameCount).ToList();
         }
     }
 }

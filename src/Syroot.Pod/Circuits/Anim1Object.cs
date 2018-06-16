@@ -29,7 +29,7 @@ namespace Syroot.Pod.Circuits
 
         /// <summary>
         /// Gets or sets the list of <see cref="Anim1ObjectFrame"/> instances which animate each mesh by an
-        /// <see cref="Anim1ObjectFrameKey"/>.
+        /// <see cref="Anim1ObjectKey"/>.
         /// </summary>
         public IList<Anim1ObjectFrame> Frames { get; set; }
 

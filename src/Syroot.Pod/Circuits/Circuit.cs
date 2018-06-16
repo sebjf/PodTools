@@ -81,6 +81,10 @@ namespace Syroot.Pod.Circuits
 
         public Sky Sky { get; set; }
 
+        public Anim2SectionList Anim2Sections { get; set; }
+
+        public RepairZoneSection RepairZoneSection { get; set; }
+
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
         protected override void LoadData(Stream stream)
@@ -130,6 +134,8 @@ namespace Syroot.Pod.Circuits
             SoundSection = loader.LoadSection<SoundSection>();
             Background = loader.Load<Background>();
             Sky = loader.Load<Sky>();
+            Anim2Sections = loader.Load<Anim2SectionList>();
+            RepairZoneSection = loader.Load<RepairZoneSection>();
         }
     }
 }

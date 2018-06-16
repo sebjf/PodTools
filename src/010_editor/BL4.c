@@ -21,10 +21,10 @@
 #include "BL4_Visible.c"
 #include "BL4_Environment.c"
 #include "BL4_Light.c"
-#include "BL4_Animation1.c"
+#include "BL4_Anim1.c"
 #include "BL4_Sound.c"
 #include "BL4_Background.c"
-#include "BL4_Animation2.c"
+#include "BL4_Anim2.c"
 #include "BL4_RepairZone.c"
 #include "BL4_Designation.c"
 #include "BL4_Difficulty.c"
@@ -45,11 +45,11 @@ typedef struct // Circuit
 	VisibleList visibleList <bgcolor = 0xBDBDEB>;
 	EnvironmentSection environment <bgcolor = 0xEFCDFF>;
 	LightSection lights <bgcolor = 0xFFCDEF>;
-	Animation1Section animation1s <bgcolor = 0xFFCDCD>;
+	Anim1Section anim1s <bgcolor = 0xFFCDCD>;
 	SoundList soundList <bgcolor = 0xFFD6CD>;
 	Background background <bgcolor = 0xFFEFCD>;
 	Sky sky <bgcolor = 0xEBDCBD>;
-	Animation2List animation2List <bgcolor = 0xEBBDBD>;
+	Anim2List anim2List <bgcolor = 0xEBBDBD>;
 	RepairZoneList repairZoneList <bgcolor = 0xFFEFCD>;
 
 	Designation designationForward <bgcolor = 0xEFFFCD>;

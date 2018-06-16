@@ -6,7 +6,7 @@ namespace Syroot.Pod.Circuits
     /// <summary>
     /// Represents the transformation of a <see cref="Mesh"/> in a <see cref="Anim1Object"/> at a given frame.
     /// </summary>
-    public class Anim1ObjectFrameKey : IData<Circuit>
+    public class Anim1ObjectKey : IData<Circuit>
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
