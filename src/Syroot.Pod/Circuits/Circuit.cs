@@ -40,23 +40,46 @@ namespace Syroot.Pod.Circuits
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         public IList<Event> Events { get; set; }
+
         public IList<Macro> MacrosBase { get; set; }
+
         public IList<Macro> Macros { get; set; }
+
         public IList<Macro> MacrosInit { get; set; }
+
         public IList<Macro> MacrosActive { get; set; }
+
         public IList<Macro> MacrosInactive { get; set; }
+
         public IList<Macro> MacrosReplace { get; set; }
+
         public IList<Macro> MacrosExchange { get; set; }
+
         public string TrackName { get; set; }
+
         public IList<uint> LevelOfDetail { get; set; }
+
         public string ProjectName { get; set; }
+
         public TextureList Textures { get; set; }
+
         public bool HasNamedSectorFaces { get; set; }
+
         public IList<Sector> Sectors { get; set; }
+
         public IList<Visibility> Visibilities { get; set; }
+
         public EnvironmentSection EnvironmentSection { get; set; }
+
         public LightSection LightSection { get; set; }
+
         public Anim1Section Anim1Section { get; set; }
+
+        public SoundSection SoundSection { get; set; }
+
+        public Background Background { get; set; }
+
+        public Sky Sky { get; set; }
 
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
@@ -104,6 +127,9 @@ namespace Syroot.Pod.Circuits
             EnvironmentSection = loader.LoadSection<EnvironmentSection>();
             LightSection = loader.LoadSection<LightSection>();
             Anim1Section = loader.LoadSection<Anim1Section>();
+            SoundSection = loader.LoadSection<SoundSection>();
+            Background = loader.Load<Background>();
+            Sky = loader.Load<Sky>();
         }
     }
 }
