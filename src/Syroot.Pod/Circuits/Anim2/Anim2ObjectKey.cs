@@ -21,5 +21,12 @@ namespace Syroot.Pod.Circuits
             FaceType = loader.ReadInt32();
             FaceIndex = loader.ReadInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Looping);
+            saver.WriteInt32(FaceType);
+            saver.WriteInt32(FaceIndex);
+        }
     }
 }

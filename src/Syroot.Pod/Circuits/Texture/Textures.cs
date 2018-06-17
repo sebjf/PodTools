@@ -22,5 +22,11 @@ namespace Syroot.Pod.Circuits
         {
             Areas = loader.LoadMany<TextureArea>(loader.ReadInt32()).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Areas.Count);
+            saver.SaveMany(Areas);
+        }
     }
 }

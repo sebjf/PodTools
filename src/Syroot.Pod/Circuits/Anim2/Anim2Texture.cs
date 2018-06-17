@@ -26,5 +26,15 @@ namespace Syroot.Pod.Circuits
             TotalTime = loader.ReadSingle16x16();
             Frames = loader.LoadMany<Anim2TextureFrame>(loader.ReadInt32()).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WritePodString(Name);
+            saver.WriteInt32(Keys.Count);
+            saver.SaveMany(Keys);
+            saver.WriteSingle16x16(TotalTime);
+            saver.WriteInt32(Frames.Count);
+            saver.SaveMany(Frames);
+        }
     }
 }

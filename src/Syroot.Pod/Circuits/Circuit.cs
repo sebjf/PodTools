@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Syroot.BinaryData;
@@ -112,17 +111,20 @@ namespace Syroot.Pod.Circuits
 
         protected override void SaveData(Stream stream)
         {
-            throw new NotImplementedException();
+            new DataSaver<Circuit>(stream, this).Execute();
         }
 
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+        // ---- METHODS ------------------------------------------------------------------------------------------------
 
-        private void LoadEventAndMacros(DataLoader<Circuit> loader)
+        void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            int count = loader.ReadInt32();
-            uint bufferSize = loader.ReadUInt32();
-            Events = loader.LoadMany<Event>(count).ToList();
+            uint checksum = loader.ReadUInt32(); // must be 3
+            uint reserved = loader.ReadUInt32(); // not used
 
+            // Load events and macros.
+            int eventCount = loader.ReadInt32();
+            uint bufferSize = loader.ReadUInt32();
+            Events = loader.LoadMany<Event>(eventCount).ToList();
             MacrosBase = loader.LoadMany<Macro>(loader.ReadInt32(), 3).ToList();
             Macros = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
             MacrosInit = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
@@ -130,16 +132,8 @@ namespace Syroot.Pod.Circuits
             MacrosInactive = loader.LoadMany<Macro>(loader.ReadInt32(), 1).ToList();
             MacrosReplace = loader.LoadMany<Macro>(loader.ReadInt32(), 2).ToList();
             MacrosExchange = loader.LoadMany<Macro>(loader.ReadInt32(), 2).ToList();
-        }
 
-        // ---- METHODS ------------------------------------------------------------------------------------------------
-
-        void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
-        {
             // Load general data.
-            uint checksum = loader.ReadUInt32(); // must be 3
-            uint reserved = loader.ReadUInt32(); // not used
-            LoadEventAndMacros(loader);
             TrackName = loader.ReadPodString();
             LevelOfDetail = loader.ReadUInt32s(16);
             ProjectName = loader.ReadPodString();
@@ -192,6 +186,94 @@ namespace Syroot.Pod.Circuits
             CompetitorsNormal = loader.LoadDifficultySection<CompetitorSection>();
             loader.Position = Offsets[(int)Offset.CompetitorsHard];
             CompetitorsHard = loader.LoadDifficultySection<CompetitorSection>();
+        }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteUInt32(3);
+            saver.WriteUInt32(0);
+
+            // Save events and macros.
+            saver.WriteInt32(Events.Count);
+            int bufferSize = 0;
+            foreach (Event evnt in Events)
+            {
+                if (evnt.ParamData.Length > 0)
+                    bufferSize += evnt.ParamData.Length * evnt.ParamData[0].Length;
+            }
+            saver.WriteInt32(bufferSize);
+            saver.SaveMany(Events);
+            saver.WriteInt32(MacrosBase.Count);
+            saver.SaveMany(MacrosBase);
+            saver.WriteInt32(Macros.Count);
+            saver.SaveMany(Macros);
+            saver.WriteInt32(MacrosInit.Count);
+            saver.SaveMany(MacrosInit);
+            saver.WriteInt32(MacrosActive.Count);
+            saver.SaveMany(MacrosActive);
+            saver.WriteInt32(MacrosInactive.Count);
+            saver.SaveMany(MacrosInactive);
+            saver.WriteInt32(MacrosReplace.Count);
+            saver.SaveMany(MacrosReplace);
+            saver.WriteInt32(MacrosExchange.Count);
+            saver.SaveMany(MacrosExchange);
+
+            // Save general data.
+            saver.WritePodString(TrackName);
+            saver.WriteUInt32s(LevelOfDetail);
+            saver.WritePodString(ProjectName);
+            saver.Save(Textures);
+            saver.WriteBoolean(HasNamedSectorFaces, BooleanCoding.Dword);
+            saver.WriteInt32(Sectors.Count);
+            saver.SaveMany(Sectors);
+            saver.WriteInt32(Visibilities.Count);
+            saver.SaveMany(Visibilities);
+            saver.SaveSection(EnvironmentSection);
+            saver.SaveSection(LightSection);
+            saver.SaveSection(Anim1Section);
+            saver.SaveSection(SoundSection);
+            saver.Save(Background);
+            saver.Save(Sky);
+            saver.Save(Anim2Sections);
+            saver.SaveSection(RepairZoneSection);
+
+            // Save forward specifications.
+            saver.Save(DesignationForward);
+
+            saver.SaveDifficultySection(DifficultyForwardEasy, "EASY");
+            saver.SaveSection(LevelForwardEasy);
+
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(DifficultyForwardNormal, "NORMAL");
+            saver.SaveSection(LevelForwardNormal);
+
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(DifficultyForwardHard, "HARD");
+            saver.SaveSection(LevelForwardHard);
+
+            // Save reverse specifications.
+            Offsets.Add((int)saver.Position);
+            saver.Save(DesignationForward);
+            saver.SaveDifficultySection(DifficultyReverseEasy, "EASY");
+            saver.SaveSection(LevelReverseEasy);
+
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(DifficultyReverseNormal, "NORMAL");
+            saver.SaveSection(LevelReverseNormal);
+
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(DifficultyReverseHard, "HARD");
+            saver.SaveSection(LevelReverseHard);
+
+            // Save competitors.
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(CompetitorsEasy, "EASY");
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(CompetitorsNormal, "NORMAL");
+            Offsets.Add((int)saver.Position);
+            saver.SaveDifficultySection(CompetitorsHard, "HARD");
+
+            Offsets.Add(0); // Seems to be a random offset.
         }
 
         // ---- CLASSES, STRUCTS & ENUMS -------------------------------------------------------------------------------

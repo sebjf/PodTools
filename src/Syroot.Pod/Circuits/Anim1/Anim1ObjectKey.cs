@@ -27,5 +27,11 @@ namespace Syroot.Pod.Circuits
             Rotation = loader.ReadMatrix3F16x16();
             Position = loader.ReadVector3F16x16();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteMatrix3F16x16(Rotation);
+            saver.WriteVector3F16x16(Position);
+        }
     }
 }

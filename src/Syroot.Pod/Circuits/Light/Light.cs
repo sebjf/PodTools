@@ -30,5 +30,15 @@ namespace Syroot.Pod.Circuits
             Diffusion = loader.ReadUInt32();
             Values = loader.ReadUInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteUInt32(Type);
+            saver.WriteBytes(Data);
+            saver.WriteUInt32(Value2);
+            saver.WriteUInt32(Value3);
+            saver.WriteUInt32(Diffusion);
+            saver.WriteUInt32(Values);
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace Syroot.Pod.Circuits
         /// </summary>
         public int StartFrame { get; set; }
 
-        public uint Value2 { get; set; }
+        public uint Unknown { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the animated texture.
@@ -31,7 +31,7 @@ namespace Syroot.Pod.Circuits
         /// Gets or sets the list of <see cref="Anim1TextureFrame"/> instances which animate each texture by an
         /// <see cref="Anim1TextureFrameKey"/>.
         /// </summary>
-        public IList<Anim1TextureFrame> Keys { get; set; }
+        public IList<Anim1TextureFrame> Frames { get; set; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
@@ -40,11 +40,23 @@ namespace Syroot.Pod.Circuits
             StartFrame = loader.ReadInt32();
             int frameCount = loader.ReadInt32();
             int configCount = loader.ReadInt32();
-            Value2 = loader.ReadUInt32();
+            Unknown = loader.ReadUInt32();
             Name = loader.ReadPodString();
             Textures = loader.Load<TextureList>(256);
             Configs = loader.LoadMany<Anim1TextureConfig>(configCount).ToList();
-            Keys = loader.LoadMany<Anim1TextureFrame>(frameCount).ToList();
+            Frames = loader.LoadMany<Anim1TextureFrame>(frameCount).ToList();
+        }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(StartFrame);
+            saver.WriteInt32(Frames.Count);
+            saver.WriteInt32(Configs.Count);
+            saver.WriteUInt32(Unknown);
+            saver.WritePodString(Name);
+            saver.Save(Textures);
+            saver.SaveMany(Configs);
+            saver.SaveMany(Frames);
         }
     }
 }

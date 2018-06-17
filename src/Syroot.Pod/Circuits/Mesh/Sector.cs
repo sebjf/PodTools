@@ -33,5 +33,17 @@ namespace Syroot.Pod.Circuits
             BoundingBoxMin = loader.ReadVector3F16x16();
             BoundingBoxMax = loader.ReadVector3F16x16();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.Save(Mesh, new MeshFaceParameters
+            {
+                HasNamedFaces = saver.Instance.HasNamedSectorFaces,
+                HasUnkProperty = true
+            });
+            saver.WriteBytes(VertexGamma);
+            saver.WriteVector3F16x16(BoundingBoxMin);
+            saver.WriteVector3F16x16(BoundingBoxMax);
+        }
     }
 }

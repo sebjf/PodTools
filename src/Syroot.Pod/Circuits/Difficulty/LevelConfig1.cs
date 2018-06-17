@@ -29,5 +29,16 @@ namespace Syroot.Pod.Circuits
             Unknown4 = loader.ReadUInt32s(loader.ReadInt32());
             Unknown5 = loader.ReadUInt32s(loader.ReadInt32());
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteVector3U(Unknown1);
+            saver.WriteInt32(Unknown2);
+            saver.WriteInt32(Unknown3);
+            saver.WriteInt32(Unknown4.Count);
+            saver.WriteUInt32s(Unknown4);
+            saver.WriteInt32(Unknown5.Count);
+            saver.WriteUInt32s(Unknown5);
+        }
     }
 }

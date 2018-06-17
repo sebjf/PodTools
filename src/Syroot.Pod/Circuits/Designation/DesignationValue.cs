@@ -15,5 +15,10 @@ namespace Syroot.Pod.Circuits
         {
             Data = loader.ReadUInt32s(8);
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteUInt32s(Data);
+        }
     }
 }

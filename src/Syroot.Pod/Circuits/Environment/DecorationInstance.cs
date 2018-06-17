@@ -8,7 +8,7 @@ namespace Syroot.Pod.Circuits
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
-        public uint Index { get; set; }
+        public int Index { get; set; }
 
         public Vector2U[] Vectors { get; set; }
 
@@ -20,10 +20,19 @@ namespace Syroot.Pod.Circuits
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            Index = loader.ReadUInt32();
+            Index = loader.ReadInt32();
             Vectors = loader.ReadMany(loader.ReadInt32(), () => loader.ReadVector2U());
             Position = loader.ReadVector3F16x16();
             Rotation = loader.ReadMatrix3F16x16();
+        }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Index);
+            saver.WriteInt32(Vectors.Length);
+            saver.WriteMany(Vectors, x => saver.WriteVector2U(x));
+            saver.WriteVector3F16x16(Position);
+            saver.WriteMatrix3F16x16(Rotation);
         }
     }
 }

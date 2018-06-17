@@ -24,5 +24,13 @@ namespace Syroot.Pod.Circuits
             PositionIndex = loader.ReadInt32();
             Unknown3 = loader.ReadInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Unknown1);
+            saver.WriteInt32(Unknown2);
+            saver.WriteInt32(PositionIndex);
+            saver.WriteInt32(Unknown3);
+        }
     }
 }

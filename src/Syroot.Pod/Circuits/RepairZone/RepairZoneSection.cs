@@ -22,5 +22,12 @@ namespace Syroot.Pod.Circuits
             RepairZones = loader.LoadMany<RepairZone>(loader.ReadInt32()).ToList();
             Time = loader.ReadSingle16x16();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(RepairZones.Count);
+            saver.SaveMany(RepairZones);
+            saver.WriteSingle16x16(Time);
+        }
     }
 }

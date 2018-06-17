@@ -25,5 +25,13 @@ namespace Syroot.Pod.Circuits
             Height = loader.ReadSingle16x16();
             Delay = loader.ReadSingle16x16();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteMany(Positions, x => saver.WriteVector3F16x16(x));
+            saver.WriteVector3F16x16(CenterPosition);
+            saver.WriteSingle16x16(Height);
+            saver.WriteSingle16x16(Delay);
+        }
     }
 }

@@ -11,25 +11,51 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
-            Circuit circuit = new Circuit(@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Test.bl4");
-            LoadAllTracks();
+            ResaveTracks();
+            DecryptTracks(@"D:\Pictures\Circuits_new", @"D:\Pictures\Circuits_new\dec");
             //EncryptAllTracks();
             //ReEncryptAllTracks();
         }
 
-        private static void LoadAllTracks()
+        private static void ResaveTracks()
         {
             string folder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
+            string newFolder = @"D:\Pictures\Circuits_new";
+            Directory.CreateDirectory(newFolder);
+
             foreach (string filePath in Directory.GetFiles(folder, "*.bl4"))
             {
                 // Partly broken files.
                 if (filePath.Contains("Arcade++") || filePath.Contains("Forest"))
                     continue;
 
-                Console.WriteLine($"Loading {Path.GetFileName(filePath)}...");
+                string fileName = Path.GetFileName(filePath);
+                string newFilePath = Path.Combine(newFolder, fileName);
+
+                Console.WriteLine($"Loading {fileName}...");
                 using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (FileStream newFile = new FileStream(newFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     Circuit circuit = new Circuit(file);
+                    circuit.Save(newFile);
+                }
+            }
+        }
+
+        private static void DecryptTracks(string inFolder, string outFolder)
+        {
+            Directory.CreateDirectory(outFolder);
+
+            foreach (string inFilePath in Directory.GetFiles(inFolder, "*.bl4"))
+            {
+                string fileName = Path.GetFileName(inFilePath);
+                string outFilePath = Path.Combine(outFolder, fileName.Replace(".bl4", ".dec.bl4"));
+
+                Console.WriteLine($"Decrypting {fileName}...");
+                using (FileStream inFile = new FileStream(inFilePath, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (FileStream outFile = new FileStream(outFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    Pbdf.Decrypt(inFile, outFile, 0x00000F7E, 0x00004000);
                 }
             }
         }

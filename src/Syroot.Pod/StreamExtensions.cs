@@ -69,6 +69,19 @@ namespace Syroot.Pod
             self.Write(buffer, 0, buffer.Length);
         }
 
+        internal static void WriteMatrix3F16x16(this Stream self, Matrix3 value)
+        {
+            WriteSingle16x16(self, value.M11);
+            WriteSingle16x16(self, value.M12);
+            WriteSingle16x16(self, value.M13);
+            WriteSingle16x16(self, value.M21);
+            WriteSingle16x16(self, value.M22);
+            WriteSingle16x16(self, value.M23);
+            WriteSingle16x16(self, value.M31);
+            WriteSingle16x16(self, value.M32);
+            WriteSingle16x16(self, value.M33);
+        }
+
         internal static void WritePodString(this Stream self, string value)
         {
             if (value == null)
@@ -79,6 +92,31 @@ namespace Syroot.Pod
             self.Write((byte)value.Length);
             for (int i = 0; i < value.Length; i++)
                 self.Write((byte)(value[i] ^ ~i));
+        }
+
+        internal static void WriteSingle16x16(this Stream self, Single value)
+        {
+            self.WriteInt32((Int32)(value * (1 << 16)));
+        }
+
+        internal static void WriteVector2U(this Stream self, Vector2U value)
+        {
+            self.WriteUInt32(value.X);
+            self.WriteUInt32(value.Y);
+        }
+
+        internal static void WriteVector3F16x16(this Stream self, Vector3F value)
+        {
+            WriteSingle16x16(self, value.X);
+            WriteSingle16x16(self, value.Y);
+            WriteSingle16x16(self, value.Z);
+        }
+
+        internal static void WriteVector3U(this Stream self, Vector3U value)
+        {
+            self.WriteUInt32(value.X);
+            self.WriteUInt32(value.Y);
+            self.WriteUInt32(value.Z);
         }
     }
 }

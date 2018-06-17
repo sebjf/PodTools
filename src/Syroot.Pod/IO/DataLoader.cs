@@ -59,7 +59,7 @@ namespace Syroot.Pod.IO
         }
 
         /// <summary>
-        /// Loads and returns <paramref name="count"/> instances <see cref="IData{T}"/> instances.
+        /// Loads and returns <paramref name="count"/> <see cref="IData{T}"/> instances.
         /// </summary>
         /// <typeparam name="TData">The type of the <see cref="IData{T}"/> to load.</typeparam>
         /// <param name="parameter">The optional parameter to pass in to all loading instances.</param>
@@ -70,22 +70,5 @@ namespace Syroot.Pod.IO
             while (count-- > 0)
                 yield return Load<TData>(parameter);
         }
-    }
-
-    /// <summary>
-    /// Represents data loadable by a <see cref="DataLoader{T}"/>.
-    /// </summary>
-    /// <typeparam name="T">The type of the instance passed by the data loader.</typeparam>
-    public interface IData<T>
-        where T : IData<T>
-    {
-        // ---- METHODS ------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Loads data from the <paramref name="loader"/> into the instance.
-        /// </summary>
-        /// <param name="loader">The <see cref="DataLoader{T}"/> to load data with.</param>
-        /// <param name="parameter">The optional parameter passed in to the instance.</param>
-        void Load(DataLoader<T> loader, object parameter = null);
     }
 }

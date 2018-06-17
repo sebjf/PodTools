@@ -33,7 +33,7 @@ namespace Syroot.Pod.Circuits
         public IList<Light> GlobalLights { get; set; }
 
         public IList<IList<Light>> SectorLights { get; set; }
-
+        
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
@@ -53,6 +53,30 @@ namespace Syroot.Pod.Circuits
             SectorLights = new List<IList<Light>>();
             while (lights-- > 0)
                 SectorLights.Add(loader.LoadMany<Light>(loader.ReadInt32()).ToList());
+        }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(SectorLights.Count);
+            saver.WriteUInt32(Value1);
+            saver.WriteVector3U(Value2);
+            saver.WriteUInt32(Value3);
+            saver.WriteUInt32(Value4);
+            saver.WriteUInt32(Value5);
+            saver.WriteUInt32(Value6);
+            saver.WriteUInt32(Value7);
+            saver.WriteUInt32(Value8);
+            saver.WriteUInt32(Value9);
+            if (SectorLights.Count > 0)
+            {
+                saver.WriteInt32(GlobalLights.Count);
+                saver.SaveMany(GlobalLights);
+            }
+            foreach (IList<Light> lights in SectorLights)
+            {
+                saver.WriteInt32(lights.Count);
+                saver.SaveMany(lights);
+            }
         }
     }
 }

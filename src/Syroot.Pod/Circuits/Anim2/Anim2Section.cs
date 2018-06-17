@@ -22,7 +22,7 @@ namespace Syroot.Pod.Circuits
         public uint Unknown1 { get; set; }
 
         public IList<Anim2Object> Objects { get; set; }
-
+        
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
@@ -33,6 +33,18 @@ namespace Syroot.Pod.Circuits
             Textures = loader.LoadMany<Anim2Texture>(loader.ReadInt32()).ToList();
             Unknown1 = loader.ReadUInt32();
             Objects = loader.LoadMany<Anim2Object>(loader.ReadInt32()).ToList();
+        }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            if (String.Compare(Name, _animeSecteurName, true, CultureInfo.InvariantCulture) == 0)
+                throw new NotImplementedException();
+
+            saver.WriteInt32(Textures.Count);
+            saver.SaveMany(Textures);
+            saver.WriteUInt32(Unknown1);
+            saver.WriteInt32(Objects.Count);
+            saver.SaveMany(Objects);
         }
     }
 }

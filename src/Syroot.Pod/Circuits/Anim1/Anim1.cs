@@ -52,5 +52,20 @@ namespace Syroot.Pod.Circuits
             Objects = loader.LoadMany<Anim1Object>(objectCount).ToList();
             Textures = loader.LoadMany<Anim1Texture>(texturesCount).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WritePodString(Name);
+            if (String.Compare(Name, _wrongWayName, true, CultureInfo.InvariantCulture) == 0)
+            {
+                saver.WriteUInt32(WrongWayValue1);
+                saver.WriteUInt32(WrongWayValue2);
+            }
+            saver.WriteInt32(Textures.Count);
+            saver.WriteInt32(Objects.Count);
+            saver.WriteUInt32(Unknown);
+            saver.SaveMany(Objects);
+            saver.SaveMany(Textures);
+        }
     }
 }

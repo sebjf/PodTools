@@ -18,5 +18,11 @@ namespace Syroot.Pod.Circuits
             Time = loader.ReadInt32();
             KeyIndex = loader.ReadInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Time);
+            saver.WriteInt32(KeyIndex);
+        }
     }
 }

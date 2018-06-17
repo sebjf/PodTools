@@ -20,5 +20,12 @@ namespace Syroot.Pod.Circuits
             AnimIndex = loader.ReadInt32();
             Frames = loader.LoadMany<Anim2ObjectFrame>(loader.ReadInt32()).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(AnimIndex);
+            saver.WriteInt32(Frames.Count);
+            saver.SaveMany(Frames);
+        }
     }
 }

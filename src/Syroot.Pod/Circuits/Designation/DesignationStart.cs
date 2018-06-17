@@ -15,5 +15,10 @@ namespace Syroot.Pod.Circuits
         {
             Data = loader.ReadBytes(36);
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteBytes(Data);
+        }
     }
 }

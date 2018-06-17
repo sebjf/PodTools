@@ -21,5 +21,11 @@ namespace Syroot.Pod.Circuits
         {
             VisibleMeshes = loader.ReadUInt32s(Math.Max(0, loader.ReadInt32()));
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(VisibleMeshes.Count);
+            saver.WriteUInt32s(VisibleMeshes);
+        }
     }
 }

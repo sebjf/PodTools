@@ -20,7 +20,7 @@ namespace Syroot.Pod.Circuits
         public IList<LevelConfig2> LevelConfig2s { get; set; }
 
         public IList<LevelConfig3> LevelConfig3s { get; set; }
-
+        
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
@@ -33,6 +33,18 @@ namespace Syroot.Pod.Circuits
             LevelConfig1s = loader.LoadMany<LevelConfig1>(levelConfig1Count).ToList();
             LevelConfig2s = loader.LoadMany<LevelConfig2>(levelConfig2Count).ToList();
             LevelConfig3s = loader.LoadMany<LevelConfig3>(levelConfig3Count).ToList();
+        }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Unknown1);
+            saver.WriteInt32(LevelConfig1s.Count);
+            saver.WriteInt32(LevelConfig2s.Count);
+            saver.WriteInt32(LevelConfig3s.Count);
+            saver.WriteInt32(Unknown2);
+            saver.SaveMany(LevelConfig1s);
+            saver.SaveMany(LevelConfig2s);
+            saver.SaveMany(LevelConfig3s);
         }
     }
 }

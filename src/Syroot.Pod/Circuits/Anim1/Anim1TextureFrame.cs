@@ -28,5 +28,12 @@ namespace Syroot.Pod.Circuits
             Unknown = loader.ReadVector3U();
             Keys = loader.LoadMany<Anim1TextureKey>(loader.ReadInt32()).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteVector3U(Unknown);
+            saver.WriteInt32(Keys.Count);
+            saver.SaveMany(Keys);
+        }
     }
 }

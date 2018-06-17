@@ -56,5 +56,26 @@ namespace Syroot.Pod.Circuits
             Phases = loader.LoadMany<DesignationPhase>(loader.ReadInt32()).ToList();
             Starts = loader.LoadMany<DesignationStart>(loader.ReadInt32()).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Unknown1);
+            saver.WriteInt32(Reserved2);
+            saver.WriteInt32(Unknown3);
+            saver.WriteInt32(Unknown4);
+            saver.WriteInt32(Reserved5);
+            saver.WriteInt32(Reserved6);
+            saver.WriteInt32(Reserved7);
+            saver.WriteInt32(Reserved8);
+            saver.WriteInt32(Reserved9);
+            saver.WriteInt32s(Unknown10);
+            saver.SaveSection(MacroSection);
+            saver.WriteInt32(PhaseMacros.Count);
+            saver.SaveMany(PhaseMacros);
+            saver.WriteInt32(Phases.Count);
+            saver.SaveMany(Phases);
+            saver.WriteInt32(Starts.Count);
+            saver.SaveMany(Starts);
+        }
     }
 }

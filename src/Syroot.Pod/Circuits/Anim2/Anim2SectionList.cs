@@ -14,5 +14,12 @@ namespace Syroot.Pod.Circuits
             while (count-- > 0)
                 Add(loader.LoadSection<Anim2Section>());
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Count * 2);
+            foreach (Anim2Section anim2 in this)
+                saver.SaveSection(anim2);
+        }
     }
 }

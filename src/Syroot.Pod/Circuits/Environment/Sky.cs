@@ -42,5 +42,19 @@ namespace Syroot.Pod.Circuits
             LensFlareTextureData = loader.ReadUInt16s(128 * 128);
             Unknown3 = loader.ReadInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteBoolean(Visible, BooleanCoding.Dword);
+            saver.WriteInt32(YEffect);
+            saver.WriteInt32(Unknown1);
+            saver.WriteInt32(Unknown2);
+            saver.WriteInt32(FadeAmount);
+            saver.WriteInt32(Speed);
+            saver.WritePodString(Name);
+            saver.Save(Textures);
+            saver.WriteUInt16s(LensFlareTextureData);
+            saver.WriteInt32(Unknown3);
+        }
     }
 }

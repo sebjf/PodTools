@@ -18,5 +18,11 @@ namespace Syroot.Pod.Circuits
             Name = loader.ReadPodString();
             MacroIndex = loader.ReadInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WritePodString(Name);
+            saver.WriteInt32(MacroIndex);
+        }
     }
 }

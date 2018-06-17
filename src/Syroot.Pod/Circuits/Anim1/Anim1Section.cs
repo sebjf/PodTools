@@ -32,5 +32,17 @@ namespace Syroot.Pod.Circuits
                 GlobalSector = loader.Load<Anim1SectorList>();
             Sectors = loader.LoadMany<Anim1SectorList>(loader.Instance.Sectors.Count).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Macros.Count);
+            saver.SaveMany(Macros);
+            saver.WriteInt32(Animations.Count);
+            saver.SaveMany(Animations);
+            saver.WriteUInt32(Unknown);
+            if (saver.Instance.Sectors.Count > 0)
+                saver.Save(GlobalSector);
+            saver.SaveMany(Sectors);
+        }
     }
 }

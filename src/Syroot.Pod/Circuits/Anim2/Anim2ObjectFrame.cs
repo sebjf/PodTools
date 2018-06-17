@@ -20,5 +20,12 @@ namespace Syroot.Pod.Circuits
             SectorIndex = loader.ReadInt32();
             Keys = loader.LoadMany<Anim2ObjectKey>(loader.ReadInt32()).ToList();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(SectorIndex);
+            saver.WriteInt32(Keys.Count);
+            saver.SaveMany(Keys);
+        }
     }
 }

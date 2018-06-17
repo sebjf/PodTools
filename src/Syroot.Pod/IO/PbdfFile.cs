@@ -83,12 +83,19 @@ namespace Syroot.Pod.IO
         /// <param name="stream">The <see cref="Stream"/> to save data in.</param>
         public void Save(Stream stream)
         {
-            // Write out the file data into a temporary stream.
+            // Compose the whole file in a temporary stream.
             using (MemoryStream decStream = new MemoryStream())
             {
+                // Write out the file data into a temporary stream.
                 Offsets = new List<int> { 0 };
-                SaveData(decStream);
-                Pbdf.WriteHeader(stream, BlockSize, Offsets, (int)decStream.Position);
+                using (MemoryStream dataStream = new MemoryStream())
+                {
+                    SaveData(dataStream);
+                    Pbdf.WriteHeader(decStream, BlockSize, Offsets, (int)dataStream.Position);
+                    dataStream.Position = 0;
+                    dataStream.CopyTo(decStream);
+                }
+                // Encrypt the data into the provided stream.
                 decStream.Position = 0;
                 Pbdf.Encrypt(decStream, stream, Key, BlockSize);
             }

@@ -213,6 +213,7 @@ namespace Syroot.Pod.IO
             stream.WriteInt32(fileSize);
 
             // Adjust and write offsets to point to encrypted data positions.
+            stream.WriteInt32(offsets.Count);
             int blockDataSize = blockSize - sizeof(uint);
             for (int i = 0; i < offsets.Count; i++)
             {

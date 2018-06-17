@@ -36,5 +36,19 @@ namespace Syroot.Pod.Circuits
             Normals = loader.ReadMany(vertexCount, () => loader.ReadVector3F16x16());
             Unknown = loader.ReadUInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            MeshFaceParameters parameters = (MeshFaceParameters)parameter;
+
+            saver.WriteInt32(Positions.Count);
+            saver.WriteMany(Positions, x => saver.WriteVector3U(x));
+            saver.WriteInt32(Faces.Count);
+            saver.WriteInt32(Faces.Where(x => x.FaceVertexCount == 3).Count());
+            saver.WriteInt32(Faces.Where(x => x.FaceVertexCount == 4).Count());
+            saver.SaveMany(Faces, parameters);
+            saver.WriteMany(Normals, x => saver.WriteVector3F16x16(x));
+            saver.WriteUInt32(Unknown);
+        }
     }
 }

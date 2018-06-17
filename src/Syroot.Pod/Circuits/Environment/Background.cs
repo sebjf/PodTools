@@ -42,5 +42,19 @@ namespace Syroot.Pod.Circuits
             YStart = loader.ReadInt32();
             YEnd = loader.ReadInt32();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(FogDistance);
+            saver.WriteInt32(FogIntensity);
+            saver.WriteInt32(BackDepth);
+            saver.WriteInt32(BackBottom);
+            saver.WriteBoolean(Visible, BooleanCoding.Dword);
+            saver.WriteUInt32(Color);
+            saver.WritePodString(Name);
+            saver.Save(Textures);
+            saver.WriteInt32(YStart);
+            saver.WriteInt32(YEnd);
+        }
     }
 }

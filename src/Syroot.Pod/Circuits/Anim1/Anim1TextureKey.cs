@@ -25,5 +25,12 @@ namespace Syroot.Pod.Circuits
             Unknown2 = loader.ReadVector2U();
             Unknown3 = loader.ReadVector2U();
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteUInt32(Unknown1);
+            saver.WriteVector2U(Unknown2);
+            saver.WriteVector2U(Unknown3);
+        }
     }
 }

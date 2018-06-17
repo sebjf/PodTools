@@ -19,5 +19,12 @@ namespace Syroot.Pod.Circuits
             Unknown1 = loader.ReadUInt32();
             AddRange(loader.LoadMany<Anim1Sector>(count).ToList());
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            saver.WriteInt32(Count);
+            saver.Write(Unknown1);
+            saver.SaveMany(this);
+        }
     }
 }

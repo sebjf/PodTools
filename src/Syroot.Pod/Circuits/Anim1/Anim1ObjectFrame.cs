@@ -30,5 +30,21 @@ namespace Syroot.Pod.Circuits
                     Keys[i] = loader.Load<Anim1ObjectKey>();
             }
         }
+
+        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        {
+            foreach (Anim1ObjectKey key in Keys)
+            {
+                if (key == null)
+                {
+                    saver.WriteBoolean(false, BooleanCoding.Dword);
+                }
+                else
+                {
+                    saver.WriteBoolean(true, BooleanCoding.Dword);
+                    saver.Save(key);
+                }
+            }
+        }
     }
 }
