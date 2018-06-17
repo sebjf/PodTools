@@ -7,14 +7,48 @@ namespace Syroot.Pod.Scratchpad
 {
     internal class Program
     {
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
+        private static readonly string[] _competitorNames = new[]
+        {
+            "svfn",
+            "pnzr667",
+            "Cyantusk",
+            "Darkriot",
+            "Kenno",
+            "glhrmfrt",
+            "katywing"
+        };
+
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
         private static void Main(string[] args)
         {
-            ResaveTracks();
-            DecryptTracks(@"D:\Pictures\Circuits_new", @"D:\Pictures\Circuits_new\dec");
-            //EncryptAllTracks();
-            //ReEncryptAllTracks();
+            PlayWithTrack();
+        }
+
+        private static void PlayWithTrack()
+        {
+            string fileName = "Beltane";
+            string backupFilePath = $@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup\{fileName}.bl4";
+            string filePath = $@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\{fileName}.bl4";
+            string decFilePath = $@"D:\Pictures\Circuits\dec_new\{fileName}.dec.bl4";
+
+            Circuit circuit = new Circuit(backupFilePath);
+            for (int i = 0; i < 7; i++)
+            {
+                circuit.CompetitorsEasy.Competitors[i].Name = _competitorNames[i];
+                circuit.CompetitorsNormal.Competitors[i].Name = _competitorNames[i];
+                circuit.CompetitorsHard.Competitors[i].Name = _competitorNames[i];
+            }
+            circuit.Save(filePath);
+
+            // Save a decrypted copy for analyzation purposes.
+            using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream outStream = new FileStream(decFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                Pbdf.Decrypt(stream, outStream, 0x00000F7E, 0x00004000);
+            }
         }
 
         private static void ResaveTracks()

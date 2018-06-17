@@ -253,7 +253,7 @@ namespace Syroot.Pod.Circuits
 
             // Save reverse specifications.
             Offsets.Add((int)saver.Position);
-            saver.Save(DesignationForward);
+            saver.Save(DesignationReverse);
             saver.SaveDifficultySection(DifficultyReverseEasy, "EASY");
             saver.SaveSection(LevelReverseEasy);
 

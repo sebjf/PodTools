@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Syroot.BinaryData;
 using Syroot.Pod.IO;
 
@@ -13,19 +12,31 @@ namespace Syroot.Pod.Circuits
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
-        public IList<uint> VisibleMeshes { get; set; } = new List<uint>();
+        /// <summary>
+        /// May be null to write -1 count instead of 0.
+        /// </summary>
+        public IList<uint> VisibleMeshes { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            VisibleMeshes = loader.ReadUInt32s(Math.Max(0, loader.ReadInt32()));
+            int count = loader.ReadInt32();
+            if (count > -1)
+                VisibleMeshes = loader.ReadUInt32s(count);
         }
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
-            saver.WriteInt32(VisibleMeshes.Count);
-            saver.WriteUInt32s(VisibleMeshes);
+            if (VisibleMeshes == null)
+            {
+                saver.WriteInt32(-1);
+            }
+            else
+            {
+                saver.WriteInt32(VisibleMeshes.Count);
+                saver.WriteUInt32s(VisibleMeshes);
+            }
         }
     }
 }
