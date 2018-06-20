@@ -9,7 +9,7 @@ typedef struct(uint hasNamedFaces, bool hasUnkNormalProperty) // Mesh
 	uint numQuad;
 	MeshFace faces(hasNamedFaces, hasUnkNormalProperty)[numFace] <optimize = false>;
 	Vector3F16x16 normals[numVertex] <optimize = true>;
-	uint unknown; // Color?
+	fixed16x16 volume;
 } Mesh;
 
 typedef struct(uint hasName, bool hasUnkNormalProperty) // MeshFace

@@ -19,7 +19,10 @@ namespace Syroot.Pod.Circuits
 
         public IList<Vector3F> Normals { get; set; }
 
-        public uint Unknown { get; set; }
+        /// <summary>
+        /// Gets or sets the virtual size of the mesh. If too low, the mesh tends to become invisible too early.
+        /// </summary>
+        public float Volume { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
@@ -34,7 +37,7 @@ namespace Syroot.Pod.Circuits
             int quadCount = loader.ReadInt32();
             Faces = loader.LoadMany<MeshFace>(faceCount, parameters).ToList();
             Normals = loader.ReadMany(vertexCount, () => loader.ReadVector3F16x16());
-            Unknown = loader.ReadUInt32();
+            Volume = loader.ReadSingle16x16();
         }
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
@@ -48,7 +51,7 @@ namespace Syroot.Pod.Circuits
             saver.WriteInt32(Faces.Where(x => x.FaceVertexCount == 4).Count());
             saver.SaveMany(Faces, parameters);
             saver.WriteMany(Normals, x => saver.WriteVector3F16x16(x));
-            saver.WriteUInt32(Unknown);
+            saver.WriteSingle16x16(Volume);
         }
     }
 }

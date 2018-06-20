@@ -13,9 +13,11 @@ namespace Syroot.Pod.Circuits
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// May be null to write -1 count instead of 0.
+        /// Gets the indices of other sectors visible when this one is active, e.g. the player car is colliding with it.
+        /// If <see langword="null"/>, collisions with this sector and resulting other sectors are completely ignored.
+        /// If 0, only this sector is visible when active.
         /// </summary>
-        public IList<uint> VisibleMeshes { get; set; }
+        public IList<int> VisibleSectorIndices { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
@@ -23,19 +25,19 @@ namespace Syroot.Pod.Circuits
         {
             int count = loader.ReadInt32();
             if (count > -1)
-                VisibleMeshes = loader.ReadUInt32s(count);
+                VisibleSectorIndices = loader.ReadInt32s(count);
         }
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
-            if (VisibleMeshes == null)
+            if (VisibleSectorIndices == null)
             {
                 saver.WriteInt32(-1);
             }
             else
             {
-                saver.WriteInt32(VisibleMeshes.Count);
-                saver.WriteUInt32s(VisibleMeshes);
+                saver.WriteInt32(VisibleSectorIndices.Count);
+                saver.WriteInt32s(VisibleSectorIndices);
             }
         }
     }
