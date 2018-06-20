@@ -184,13 +184,20 @@ namespace Syroot.Pod.IO
         /// <returns>The list of read and adjusted offsets.</returns>
         public static IList<int> ReadHeader(Stream stream, int blockSize)
         {
-            // Read header data.
-            stream.ReadInt32(); // File size.
+            int headerSize = 2 * sizeof(int); // FileSize + OffsetCount
 
-            // Read and adjusts offsets to point to decrypted data positions.
-            List<int> offsets = new List<int>(stream.ReadInt32s(stream.ReadInt32()));
+            // Read header data.
+            _ = stream.ReadInt32(); // File size.
+            int offsetCount = stream.ReadInt32();
+            headerSize += offsetCount * sizeof(int);
+
+            // Read and adjust offsets to be relative to data start.
+            List<int> offsets = new List<int>(stream.ReadInt32s(offsetCount));
             for (int i = 0; i < offsets.Count; i++)
+            {
                 offsets[i] -= offsets[i] / blockSize * sizeof(uint);
+                offsets[i] -= headerSize;
+            }
             return offsets;
         }
 
@@ -204,23 +211,21 @@ namespace Syroot.Pod.IO
         /// <param name="dataSize">The size of the file data (excluding the header) in bytes.</param>
         public static void WriteHeader(Stream stream, int blockSize, IList<int> offsets, int dataSize)
         {
-            // Write header data.
             // Calculate the final file size to write them into the data stream.
             int headerSize = (2 + offsets.Count) * sizeof(int); // FileSize + OffsetCount + Offsets
             int fileSize = headerSize + dataSize;
-            int blockCount = dataSize / blockSize + 1; // Adjust to next complete block.
-            fileSize += blockCount * sizeof(uint); // Adjust for checksums at the end of each block.
+            int blockCount = (fileSize / blockSize) + 1; // Adjust to next complete block.
+            fileSize = blockCount * blockSize; // Adjust to full block.
             stream.WriteInt32(fileSize);
 
-            // Adjust and write offsets to point to encrypted data positions.
+            // Write adjusted offsets which are relative to the encrypted data stream.
             stream.WriteInt32(offsets.Count);
             int blockDataSize = blockSize - sizeof(uint);
             for (int i = 0; i < offsets.Count; i++)
             {
-                int offset = offsets[i];
-                offset += headerSize;
-                offset += offset / blockDataSize * sizeof(int);
-                stream.WriteInt32(offset);
+                offsets[i] += offsets[i] / blockDataSize * sizeof(uint);
+                offsets[i] += headerSize;
+                stream.WriteInt32(offsets[i]);
             }
         }
     }

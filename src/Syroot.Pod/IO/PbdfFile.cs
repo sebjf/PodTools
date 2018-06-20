@@ -37,14 +37,20 @@ namespace Syroot.Pod.IO
             BlockSize = Pbdf.RetrieveBlockSize(stream, Key);
             stream.Position = 0;
 
-            // Decrypt the data into a temporary stream to load data from.
-            using (MemoryStream decStream = new MemoryStream())
+            // Decrypt header and data into a temporary stream.
+            byte[] buffer = new byte[stream.Length - (stream.Length / BlockSize * sizeof(uint))];
+            using (MemoryStream decStream = new MemoryStream(buffer))
             {
                 Pbdf.Decrypt(stream, decStream, Key, BlockSize);
+
+                // Read the header and adjusted offsets.
                 decStream.Position = 0;
                 Offsets = Pbdf.ReadHeader(decStream, BlockSize);
-                decStream.Position = Offsets[0];
-                LoadData(decStream);
+                int headerSize = (int)decStream.Position;
+
+                // Create a stream view on the data excluding the header.
+                using (MemoryStream dataStream = new MemoryStream(buffer, headerSize, buffer.Length - headerSize))
+                    LoadData(dataStream);
             }
         }
 
@@ -61,7 +67,8 @@ namespace Syroot.Pod.IO
         public int BlockSize { get; protected set; }
 
         /// <summary>
-        /// Gets the list of offsets at which specific data is stored.
+        /// Gets the list of offsets at which specific data is stored. They are relative to the start of the data, e.g.
+        /// starting behind the file header, and are adjusted upon loading and saving.
         /// </summary>
         public IList<int> Offsets { get; protected set; }
 
@@ -83,11 +90,11 @@ namespace Syroot.Pod.IO
         /// <param name="stream">The <see cref="Stream"/> to save data in.</param>
         public void Save(Stream stream)
         {
-            // Compose the whole file in a temporary stream.
+            // Compose the decrypted file contents in a temporary stream.
             using (MemoryStream decStream = new MemoryStream())
             {
                 // Write out the file data into a temporary stream.
-                Offsets = new List<int> { 0 };
+                Offsets = new List<int>();
                 using (MemoryStream dataStream = new MemoryStream())
                 {
                     SaveData(dataStream);
@@ -104,16 +111,15 @@ namespace Syroot.Pod.IO
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Loads instance data from the given <paramref name="stream"/> storing the decrypted data.
+        /// Loads instance data from the given <paramref name="stream"/> storing the decrypted data (without the
+        /// header).
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to load the data from, positioned at the first offset of the
-        /// <see cref="Offsets"/> list.</param>
+        /// <param name="stream">The <see cref="Stream"/> to load the data from.</param>
         protected abstract void LoadData(Stream stream);
 
         /// <summary>
         /// Saves instance data (without the header) in the given <paramref name="stream"/>. The list of
-        /// <see cref="Offsets"/> now only contains the position behind the header and should be extended to store
-        /// additional offsets into this stream.
+        /// <see cref="Offsets"/> should be filled to store offsets into the written data.
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> to save the data to.</param>
         protected abstract void SaveData(Stream stream);

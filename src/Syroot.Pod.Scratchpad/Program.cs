@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Syroot.Pod.Circuits;
 using Syroot.Pod.IO;
 
@@ -24,30 +26,81 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
-            PlayWithTrack();
+            string inFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup";
+            string outFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
+
+            foreach (string inFilePath in Directory.GetFiles(inFolder, "*.bl4"))
+            {
+                if (!inFilePath.Contains("Cocoon")) continue;
+                // Ignore partly broken files.
+                if (inFilePath.Contains("Arcade++") || inFilePath.Contains("Forest"))
+                    continue;
+
+                string fileName = Path.GetFileName(inFilePath);
+                string outFilePath = Path.Combine(outFolder, fileName);
+
+                Console.WriteLine($"Modifying {fileName}...");
+                Circuit circuit = new Circuit(inFilePath);
+                //PlayWithTrack(circuit);
+                circuit.Save(outFilePath);
+                //RawPbdf raw = new RawPbdf(inFilePath);
+                //raw.Save(outFilePath);
+
+                // Save a decrypted copy for analyzation purposes.
+                string decFilePath = $@"D:\Pictures\Circuits\decnew\{Path.GetFileNameWithoutExtension(inFilePath)}.new.dec.bl4";
+                using (FileStream stream = new FileStream(outFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (FileStream outStream = new FileStream(decFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    Pbdf.Decrypt(stream, outStream, 0x00000F7E, 0x00004000);
+                }
+            }
         }
 
-        private static void PlayWithTrack()
+        private static void PlayWithTrack(Circuit circuit)
         {
-            string fileName = "Beltane";
-            string backupFilePath = $@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup\{fileName}.bl4";
-            string filePath = $@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\{fileName}.bl4";
-            string decFilePath = $@"D:\Pictures\Circuits\dec_new\{fileName}.dec.bl4";
+            circuit.Background.Visible = true;
+            circuit.Sky.Visible = true;
 
-            Circuit circuit = new Circuit(backupFilePath);
+            // Remove invisible walls, make remaining polygons solid.
+            foreach (Sector sector in circuit.Sectors)
+            {
+                Mesh mesh = sector.Mesh;
+                foreach (MeshFace face in mesh.Faces)
+                {
+                    if ((face.Properties & 0b1) == 0)
+                    {
+                        // If not visible, not collidable!
+                        face.Properties = 0;
+                    }
+                    else if ((face.Properties & 0b101000) == 0)
+                    {
+                        // If not road, make road.
+                        // TODO: Calculate normal to decide if wall or road.
+                        face.Properties |= 0b1000;
+                        face.Unknown = 0;
+                    }
+                }
+            }
+            // Make sectors visibile and collidable at all times.
+            for (int i = 0; i < circuit.Visibilities.Count; i++)
+            {
+                // Only set up uncollidable sectors, as cross sections crash the game otherwise?
+                //if (circuit.Visibilities[i].VisibleSectorIndices == null)
+                //{
+                    IList<int> indices = Enumerable.Range(0, circuit.Visibilities.Count).Where(x => x != i).ToList();
+                    circuit.Visibilities[i].VisibleSectorIndices = indices;
+                //}
+            }
+
+            // Rename opponents to POD Discord server members.
             for (int i = 0; i < 7; i++)
             {
-                circuit.CompetitorsEasy.Competitors[i].Name = _competitorNames[i];
-                circuit.CompetitorsNormal.Competitors[i].Name = _competitorNames[i];
-                circuit.CompetitorsHard.Competitors[i].Name = _competitorNames[i];
-            }
-            circuit.Save(filePath);
-
-            // Save a decrypted copy for analyzation purposes.
-            using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream outStream = new FileStream(decFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                Pbdf.Decrypt(stream, outStream, 0x00000F7E, 0x00004000);
+                if (circuit.CompetitorsEasy != null)
+                    circuit.CompetitorsEasy.Competitors[i].Name = _competitorNames[i];
+                if (circuit.CompetitorsNormal != null)
+                    circuit.CompetitorsNormal.Competitors[i].Name = _competitorNames[i];
+                if (circuit.CompetitorsHard != null)
+                    circuit.CompetitorsHard.Competitors[i].Name = _competitorNames[i];
             }
         }
 
@@ -146,10 +199,20 @@ namespace Syroot.Pod.Scratchpad
                 }
             }
         }
+
+        private static void TestRawPbdf()
+        {
+            RawPbdf rawPbdf = new RawPbdf(@"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup\Heaven.bl4");
+            rawPbdf.Save(@"D:\Pictures\new.bl4");
+        }
     }
 
     internal class RawPbdf : PbdfFile
     {
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
+        private IList<int> _offsets;
+
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         public RawPbdf(string fileName) : base(fileName) { }
@@ -162,12 +225,14 @@ namespace Syroot.Pod.Scratchpad
 
         protected override void LoadData(Stream stream)
         {
+            _offsets = Offsets;
             Data = new byte[stream.Length];
-            stream.Read(Data, 0, (int)stream.Length);
+            stream.Read(Data, 0, Data.Length);
         }
 
         protected override void SaveData(Stream stream)
         {
+            Offsets = _offsets;
             stream.Write(Data, 0, Data.Length);
         }
     }

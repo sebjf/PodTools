@@ -118,6 +118,7 @@ namespace Syroot.Pod.Circuits
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
+            loader.Position = Offsets[(int)Offset.Default];
             uint checksum = loader.ReadUInt32(); // must be 3
             uint reserved = loader.ReadUInt32(); // not used
 
@@ -190,6 +191,7 @@ namespace Syroot.Pod.Circuits
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
+            Offsets.Add((int)saver.Position);
             saver.WriteUInt32(3);
             saver.WriteUInt32(0);
 
