@@ -13,7 +13,7 @@ namespace Syroot.Pod.Circuits
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
-        public IList<Vector3U> Positions { get; set; }
+        public IList<Vector3F> Positions { get; set; }
 
         public IList<MeshFace> Faces { get; set; }
 
@@ -31,7 +31,7 @@ namespace Syroot.Pod.Circuits
             MeshFaceParameters parameters = (MeshFaceParameters)parameter;
 
             int vertexCount = loader.ReadInt32();
-            Positions = loader.ReadMany(vertexCount, () => loader.ReadVector3U());
+            Positions = loader.ReadMany(vertexCount, () => loader.ReadVector3F16x16());
             int faceCount = loader.ReadInt32();
             int triCount = loader.ReadInt32();
             int quadCount = loader.ReadInt32();
@@ -45,7 +45,7 @@ namespace Syroot.Pod.Circuits
             MeshFaceParameters parameters = (MeshFaceParameters)parameter;
 
             saver.WriteInt32(Positions.Count);
-            saver.WriteMany(Positions, x => saver.WriteVector3U(x));
+            saver.WriteMany(Positions, x => saver.WriteVector3F16x16(x));
             saver.WriteInt32(Faces.Count);
             saver.WriteInt32(Faces.Where(x => x.FaceVertexCount == 3).Count());
             saver.WriteInt32(Faces.Where(x => x.FaceVertexCount == 4).Count());
