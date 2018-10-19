@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Syroot.Pod.Circuits;
 using Syroot.Pod.IO;
+using SJF.Pod.Converter;
 
 namespace Syroot.Pod.Scratchpad
 {
@@ -26,33 +27,29 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
-            string inFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits\Backup";
+            string inFolder = @"C:\Users\Sebastian\Dropbox\Projects\POD\Original Tracks\AlderOEM";
             string outFolder = @"D:\Archive\Games\Pod\Installation\Data\Binary\Circuits";
 
             foreach (string inFilePath in Directory.GetFiles(inFolder, "*.bl4"))
             {
-                if (!inFilePath.Contains("Cocoon")) continue;
                 // Ignore partly broken files.
-                if (inFilePath.Contains("Arcade++") || inFilePath.Contains("Forest"))
+                if (inFilePath.Contains("Arcade++"))
+                    continue;
+                if (inFilePath.Contains("Forest"))
+                    continue;
+
+                if (!inFilePath.Contains("BELTANE.BL4"))
                     continue;
 
                 string fileName = Path.GetFileName(inFilePath);
-                string outFilePath = Path.Combine(outFolder, fileName);
 
-                Console.WriteLine($"Modifying {fileName}...");
                 Circuit circuit = new Circuit(inFilePath);
-                //PlayWithTrack(circuit);
-                circuit.Save(outFilePath);
-                //RawPbdf raw = new RawPbdf(inFilePath);
-                //raw.Save(outFilePath);
 
-                // Save a decrypted copy for analyzation purposes.
-                string decFilePath = $@"D:\Pictures\Circuits\decnew\{Path.GetFileNameWithoutExtension(inFilePath)}.new.dec.bl4";
-                using (FileStream stream = new FileStream(outFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                using (FileStream outStream = new FileStream(decFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    Pbdf.Decrypt(stream, outStream, 0x00000F7E, 0x00004000);
-                }
+                Converter converter = new Converter();
+                converter.Add(circuit);
+                converter.Save(@"C:\Users\Sebastian\Documents\Unity Projects\PoD\Assets\Circuits\Beltane\Beltane.obj");
+
+
             }
         }
 

@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SJF.Pod.Converter\SJF.Pod.Converter.csproj" />
     <ProjectReference Include="..\Syroot.Pod\Syroot.Pod.csproj" />
   </ItemGroup>
 
