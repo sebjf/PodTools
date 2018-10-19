@@ -1,5 +1,6 @@
 ﻿using Syroot.BinaryData;
 using Syroot.Pod.IO;
+using Syroot.Maths;
 
 namespace Syroot.Pod.Circuits
 {
@@ -7,18 +8,18 @@ namespace Syroot.Pod.Circuits
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
-        public byte[] Data { get; set; }
+        public Vector3F Data { get; set; }
 
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            Data = loader.ReadBytes(36);
+            Data = loader.ReadVector3F16x16();
         }
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
-            saver.WriteBytes(Data);
+            saver.WriteVector3F16x16(Data);
         }
     }
 }
