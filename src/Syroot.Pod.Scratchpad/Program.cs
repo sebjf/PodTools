@@ -33,6 +33,9 @@ namespace Syroot.Pod.Scratchpad
 
                 var car = new Cars.Car(inFilePath);
 
+                Converter converter = new Converter();
+                converter.Add(car);
+                converter.Save(@"C:\Users\Sebastian\Dropbox\Projects\POD\Export\Alien.obj");
             }
         }
 

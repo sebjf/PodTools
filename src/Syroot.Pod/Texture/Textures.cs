@@ -16,6 +16,8 @@ namespace Syroot.Pod.Circuits
 
         public ushort[] Data { get; set; } // 256x256, RGB565
 
+        public int _Size;
+
     }
 
     public class Texture<T> : Texture, IData<T> where T : PbdfFile, IData<T>

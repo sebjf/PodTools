@@ -5,11 +5,12 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
-using Syroot.Pod;
-using Syroot.Pod.Circuits;
-using Syroot.Pod.IO;
-using JeremyAnsel.Media.WavefrontObj;
 using Syroot.Maths;
+using Syroot.Pod;
+using Syroot.Pod.IO;
+using Syroot.Pod.Circuits;
+using Syroot.Pod.Cars;
+using JeremyAnsel.Media.WavefrontObj;
 
 namespace SJF.Pod.Converter
 {
@@ -124,8 +125,6 @@ namespace SJF.Pod.Converter
 
     public class Converter
     {
-        const int size = 256;
-
         PortableMesh pmesh;
 
         Dictionary<uint, PortableMaterial> flatMaterials = new Dictionary<uint, PortableMaterial>();
@@ -199,6 +198,8 @@ namespace SJF.Pod.Converter
 
         public void Add(Texture texture, string prefix)
         {
+            var size = texture._Size;
+
             var image = new Bitmap(size, size, PixelFormat.Format32bppRgb);
 
             for (int y = 0; y < size; y++)
@@ -273,6 +274,37 @@ namespace SJF.Pod.Converter
 
 
 
+        }
+
+        public void Add(Car car)
+        {
+            ResetMaterials();
+
+            foreach (var texture in car.Material.Textures)
+            {
+                Add(texture, "diffuse");
+            }
+
+            Add(car.Geometry.Good);
+            //Add(car.Geometry.Wheels);
+        }
+
+        void Add(Body body)
+        {
+            Add(body.FrontL);
+            Add(body.FrontR);
+            Add(body.SideL);
+            Add(body.SideR);
+            Add(body.RearL);
+            Add(body.RearR);
+        }
+
+        void Add(Wheels wheel)
+        {
+            Add(wheel.FrontL);
+            Add(wheel.FrontR);
+            Add(wheel.RearL);
+            Add(wheel.RearR);
         }
 
         void Add(Sector sector)

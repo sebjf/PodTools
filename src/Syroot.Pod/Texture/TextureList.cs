@@ -31,6 +31,7 @@ namespace Syroot.Pod.Circuits
                     foreach (Texture texture in this)
                     {
                         texture.Data = loader.ReadUInt16s(128 * 128);
+                        texture._Size = 128;
                     }
                     break;
 
@@ -38,6 +39,7 @@ namespace Syroot.Pod.Circuits
                     foreach (Texture texture in this)
                     {
                         texture.Data = loader.ReadUInt16s(textureSize * textureSize);
+                        texture._Size = textureSize;
                     }
                     break;
             }
