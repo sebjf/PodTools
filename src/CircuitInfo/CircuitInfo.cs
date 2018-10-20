@@ -3,7 +3,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace CircuitInfo
+namespace AssetsInfo
 {
     /*
     This library is for Unity, which needs .net 3.5.
@@ -11,8 +11,6 @@ namespace CircuitInfo
     select "Individual Components" tab
     select ".NET Framework 3.5 development tools"
     */
-
-
 
     public class CircuitInfo
     {

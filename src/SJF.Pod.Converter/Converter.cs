@@ -132,7 +132,7 @@ namespace SJF.Pod.Converter
         Dictionary<uint, PortableMaterial> textureMaterials = new Dictionary<uint, PortableMaterial>();
         List<PortableTexture> textures = new List<PortableTexture>();
 
-        CircuitInfo.CircuitInfo info;
+        AssetsInfo.CircuitInfo info;
 
         public Converter()
         {
@@ -253,7 +253,7 @@ namespace SJF.Pod.Converter
             {
             }
 
-            info = new CircuitInfo.CircuitInfo();
+            info = new AssetsInfo.CircuitInfo();
 
             // get the start positions
             // (remember to swap z & y)

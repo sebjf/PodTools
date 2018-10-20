@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CircuitInfo\CircuitInfo.csproj" />
+    <ProjectReference Include="..\CircuitInfo\AssetsInfo.csproj" />
     <ProjectReference Include="..\JeremyAnsel.Media.WavefrontObj\JeremyAnsel.Media.WavefrontObj\JeremyAnsel.Media.WavefrontObj\JeremyAnsel.Media.WavefrontObj.csproj" />
     <ProjectReference Include="..\Syroot.Pod\Syroot.Pod.csproj" />
   </ItemGroup>

@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SJF.Pod.Converter", "SJF.Po
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JeremyAnsel.Media.WavefrontObj", "JeremyAnsel.Media.WavefrontObj\JeremyAnsel.Media.WavefrontObj\JeremyAnsel.Media.WavefrontObj\JeremyAnsel.Media.WavefrontObj.csproj", "{32A40ACD-819E-49C7-B2B8-CCF20AE2286E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircuitInfo", "CircuitInfo\CircuitInfo.csproj", "{3315DBD0-7138-4B13-8DDF-97612A2DBA97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetsInfo", "CircuitInfo\AssetsInfo.csproj", "{3315DBD0-7138-4B13-8DDF-97612A2DBA97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
