@@ -1,5 +1,6 @@
 ﻿using Syroot.BinaryData;
 using Syroot.Pod.IO;
+using System.Collections.Generic;
 
 namespace Syroot.Pod.Circuits
 {
@@ -21,7 +22,7 @@ namespace Syroot.Pod.Circuits
 
         public string Name { get; set; }
 
-        public TextureList Textures { get; set; }
+        public IList<Texture> Textures { get; set; }
 
         public int YStart { get; set; }
 
@@ -38,7 +39,7 @@ namespace Syroot.Pod.Circuits
             Visible = loader.ReadBoolean(BooleanCoding.Dword);
             Color = loader.ReadUInt32();
             Name = loader.ReadPodString();
-            Textures = loader.Load<TextureList>(256);
+            Textures = loader.Load<TextureList<Circuit>>(256);
             YStart = loader.ReadInt32();
             YEnd = loader.ReadInt32();
         }
@@ -52,7 +53,7 @@ namespace Syroot.Pod.Circuits
             saver.WriteBoolean(Visible, BooleanCoding.Dword);
             saver.WriteUInt32(Color);
             saver.WritePodString(Name);
-            saver.Save(Textures);
+            saver.Save(Textures as TextureList<Circuit>);
             saver.WriteInt32(YStart);
             saver.WriteInt32(YEnd);
         }

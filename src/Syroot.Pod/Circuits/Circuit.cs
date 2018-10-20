@@ -9,7 +9,7 @@ namespace Syroot.Pod.Circuits
     /// <summary>
     /// Represents BL4 files.
     /// </summary>
-    public class Circuit : PbdfFile, IData<Circuit>
+    public class Circuit : PbdfFile, IData<Circuit>, IAssetFile
     {
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ namespace Syroot.Pod.Circuits
 
         public string ProjectName { get; set; }
 
-        public TextureList Textures { get; set; }
+        public IList<Texture> Textures { get; set; }
 
         public bool HasNamedSectorFaces { get; set; }
 
@@ -102,6 +102,9 @@ namespace Syroot.Pod.Circuits
         public CompetitorSection CompetitorsNormal { get; set; }
         public CompetitorSection CompetitorsHard { get; set; }
 
+        public FileType FileType { get { return FileType.BL4; } }
+        public PodVersion PodVersion { get; set; }
+
         // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
 
         protected override void LoadData(Stream stream)
@@ -138,7 +141,7 @@ namespace Syroot.Pod.Circuits
             TrackName = loader.ReadPodString();
             LevelOfDetail = loader.ReadUInt32s(16);
             ProjectName = loader.ReadPodString();
-            Textures = loader.Load<TextureList>(256);
+            Textures = loader.Load<TextureList<Circuit>>(256);
             HasNamedSectorFaces = loader.ReadBoolean(BooleanCoding.Dword);
             Sectors = loader.LoadMany<Sector>(loader.ReadInt32()).ToList();
             Visibilities = loader.LoadMany<Visibility>(loader.ReadInt32()).ToList();
@@ -224,7 +227,7 @@ namespace Syroot.Pod.Circuits
             saver.WritePodString(TrackName);
             saver.WriteUInt32s(LevelOfDetail);
             saver.WritePodString(ProjectName);
-            saver.Save(Textures);
+            saver.Save(Textures as TextureList<Circuit>);
             saver.WriteBoolean(HasNamedSectorFaces, BooleanCoding.Dword);
             saver.WriteInt32(Sectors.Count);
             saver.SaveMany(Sectors);

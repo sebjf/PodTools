@@ -44,27 +44,17 @@ namespace Syroot.Pod.Circuits
             HasNamedFaces = loader.ReadBoolean(BooleanCoding.Dword);
             int meshCount = loader.ReadInt32();
             Name = loader.ReadPodString();
-            Meshes = loader.LoadMany<Mesh>(meshCount, new MeshFaceParameters
+            Meshes = loader.LoadMany<Mesh<Circuit>>(meshCount, new MeshFaceParameters
             {
                 HasNamedFaces = HasNamedFaces,
                 HasUnkProperty = false
-            }).ToList();
+            }).Cast<Mesh>().ToList();
             Frames = loader.LoadMany<Anim1ObjectFrame>(frameCount, meshCount).ToList();
         }
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
-            saver.WriteInt32(StartFrame);
-            saver.WriteInt32(Frames.Count);
-            saver.WriteBoolean(HasNamedFaces, BooleanCoding.Dword);
-            saver.WriteInt32(Meshes.Count);
-            saver.WritePodString(Name);
-            saver.SaveMany(Meshes, new MeshFaceParameters
-            {
-                HasNamedFaces = HasNamedFaces,
-                HasUnkProperty = false
-            });
-            saver.SaveMany(Frames);
+            throw new System.NotImplementedException();
         }
     }
 }

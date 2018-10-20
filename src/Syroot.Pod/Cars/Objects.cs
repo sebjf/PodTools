@@ -62,39 +62,39 @@ namespace Syroot.Pod.Cars
             parameters.HasNamedFaces = loader.ReadUInt32() > 0;
             parameters.HasPrism = true;
 
-            Good.RearR = loader.Load<Mesh>(parameters);
-            Good.RearL = loader.Load<Mesh>(parameters);
-            Good.SideR = loader.Load<Mesh>(parameters);
-            Good.SideL = loader.Load<Mesh>(parameters);
-            Good.FrontR = loader.Load<Mesh>(parameters);
-            Good.FrontL = loader.Load<Mesh>(parameters);
-            Damaged.RearR = loader.Load<Mesh>(parameters);
-            Damaged.RearL = loader.Load<Mesh>(parameters);
-            Damaged.SideR = loader.Load<Mesh>(parameters);
-            Damaged.SideL = loader.Load<Mesh>(parameters);
-            Damaged.FrontR = loader.Load<Mesh>(parameters);
-            Damaged.FrontL = loader.Load<Mesh>(parameters);
-            Ruined.RearR = loader.Load<Mesh>(parameters);
-            Ruined.RearL = loader.Load<Mesh>(parameters);
-            Ruined.SideR = loader.Load<Mesh>(parameters);
-            Ruined.SideL = loader.Load<Mesh>(parameters);
-            Ruined.FrontR = loader.Load<Mesh>(parameters);
-            Ruined.FrontL = loader.Load<Mesh>(parameters);
+            Good.RearR = loader.Load<Mesh<Car>>(parameters);
+            Good.RearL = loader.Load<Mesh<Car>>(parameters);
+            Good.SideR = loader.Load<Mesh<Car>>(parameters);
+            Good.SideL = loader.Load<Mesh<Car>>(parameters);
+            Good.FrontR = loader.Load<Mesh<Car>>(parameters);
+            Good.FrontL = loader.Load<Mesh<Car>>(parameters);
+            Damaged.RearR = loader.Load<Mesh<Car>>(parameters);
+            Damaged.RearL = loader.Load<Mesh<Car>>(parameters);
+            Damaged.SideR = loader.Load<Mesh<Car>>(parameters);
+            Damaged.SideL = loader.Load<Mesh<Car>>(parameters);
+            Damaged.FrontR = loader.Load<Mesh<Car>>(parameters);
+            Damaged.FrontL = loader.Load<Mesh<Car>>(parameters);
+            Ruined.RearR = loader.Load<Mesh<Car>>(parameters);
+            Ruined.RearL = loader.Load<Mesh<Car>>(parameters);
+            Ruined.SideR = loader.Load<Mesh<Car>>(parameters);
+            Ruined.SideL = loader.Load<Mesh<Car>>(parameters);
+            Ruined.FrontR = loader.Load<Mesh<Car>>(parameters);
+            Ruined.FrontL = loader.Load<Mesh<Car>>(parameters);
 
-            Wheels.FrontR = loader.Load<Mesh>(parameters);
-            Wheels.RearR = loader.Load<Mesh>(parameters);
-            Wheels.FrontL = loader.Load<Mesh>(parameters);
-            Wheels.RearL = loader.Load<Mesh>(parameters);
+            Wheels.FrontR = loader.Load<Mesh<Car>>(parameters);
+            Wheels.RearR = loader.Load<Mesh<Car>>(parameters);
+            Wheels.FrontL = loader.Load<Mesh<Car>>(parameters);
+            Wheels.RearL = loader.Load<Mesh<Car>>(parameters);
 
             parameters.HasPrism = false;
 
-            ShadowGood.Front = loader.Load<Mesh>(parameters);
+            ShadowGood.Front = loader.Load<Mesh<Car>>(parameters);
 
-            if ((parameter as CarFileInfo).PodVersion != PodVersion.POD1)
+            if (loader.Instance.PodVersion != PodVersion.POD1)
             {
-                ShadowGood.Rear = loader.Load<Mesh>(parameters);
-                ShadowRuined.Front = loader.Load<Mesh>(parameters);
-                ShadowRuined.Rear = loader.Load<Mesh>(parameters);
+                ShadowGood.Rear = loader.Load<Mesh<Car>>(parameters);
+                ShadowRuined.Front = loader.Load<Mesh<Car>>(parameters);
+                ShadowRuined.Rear = loader.Load<Mesh<Car>>(parameters);
             }
 
             CollisionMeshes = loader.LoadMany<CollisionMesh>(2).ToArray();

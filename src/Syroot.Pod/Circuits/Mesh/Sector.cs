@@ -24,7 +24,7 @@ namespace Syroot.Pod.Circuits
 
         void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
         {
-            Mesh = loader.Load<Mesh>(new MeshFaceParameters
+            Mesh = loader.Load<Mesh<Circuit>>(new MeshFaceParameters
             {
                 HasNamedFaces = loader.Instance.HasNamedSectorFaces,
                 HasUnkProperty = true
@@ -36,14 +36,7 @@ namespace Syroot.Pod.Circuits
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
-            saver.Save(Mesh, new MeshFaceParameters
-            {
-                HasNamedFaces = saver.Instance.HasNamedSectorFaces,
-                HasUnkProperty = true
-            });
-            saver.WriteBytes(VertexGamma);
-            saver.WriteVector3F16x16(BoundingBoxMin);
-            saver.WriteVector3F16x16(BoundingBoxMax);
+            throw new System.NotImplementedException();
         }
     }
 }

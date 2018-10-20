@@ -23,7 +23,7 @@ namespace Syroot.Pod.Circuits
         /// loading this instance.</remarks>
         public string Name { get; set; }
 
-        public TextureList Textures { get; set; }
+        public IList<Texture> Textures { get; set; }
 
         public IList<Anim1TextureConfig> Configs { get; set; }
 
@@ -42,21 +42,14 @@ namespace Syroot.Pod.Circuits
             int configCount = loader.ReadInt32();
             Unknown = loader.ReadUInt32();
             Name = loader.ReadPodString();
-            Textures = loader.Load<TextureList>(256);
+            Textures = loader.Load<TextureList<Circuit>>(256);
             Configs = loader.LoadMany<Anim1TextureConfig>(configCount).ToList();
             Frames = loader.LoadMany<Anim1TextureFrame>(frameCount).ToList();
         }
 
         void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
         {
-            saver.WriteInt32(StartFrame);
-            saver.WriteInt32(Frames.Count);
-            saver.WriteInt32(Configs.Count);
-            saver.WriteUInt32(Unknown);
-            saver.WritePodString(Name);
-            saver.Save(Textures);
-            saver.SaveMany(Configs);
-            saver.SaveMany(Frames);
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -6,28 +6,14 @@ using Syroot.Pod.IO;
 
 namespace Syroot.Pod.Cars
 {
-    public enum FileVersion
-    {
-        BV3,
-        BV4,
-        BV6,
-        BV7
-    }
-
-    public enum PodVersion
-    {
-        POD1,
-        POD2
-    }
-
     public class CarFileInfo
     {
-        public FileVersion FileVersion;
+        public FileType FileVersion;
         public PodVersion PodVersion;
         public bool PodDemo;
     }
 
-    public class Car : PbdfFile, IData<Car>
+    public class Car : PbdfFile, IData<Car>, IAssetFile
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Car"/> class.
@@ -64,22 +50,27 @@ namespace Syroot.Pod.Cars
         public Noise Noise { get; set; }
         public Characteristics Characteristics { get; set; }
 
+        public FileType FileType { get; private set; }
+        public PodVersion PodVersion { get; set; }
+
         public void Load(DataLoader<Car> loader, object parameter = null)
         {
+            FileType = (Parameter as CarFileInfo).FileVersion;
+            PodVersion = (Parameter as CarFileInfo).PodVersion;
+            bool PodDemo = (Parameter as CarFileInfo).PodDemo;
+
             loader.Position = Offsets[0];
 
-            var FileInfo = Parameter as CarFileInfo;
-
-            if (!FileInfo.PodDemo)
+            if (!PodDemo)
             {
                 Name = loader.ReadPodString();
             }
 
-            Data = loader.Load<CarData>(FileInfo);
-            Material = loader.Load<Material>(FileInfo);
-            Geometry = loader.Load<Objects>(FileInfo);
-            Noise = loader.Load<Noise>(FileInfo);
-            Characteristics = loader.Load<Characteristics>(FileInfo);
+            Data = loader.Load<CarData>();
+            Material = loader.Load<Material>(256);
+            Geometry = loader.Load<Objects>();
+            Noise = loader.Load<Noise>();
+            Characteristics = loader.Load<Characteristics>();
 
             var Unknown_0000 = loader.ReadUInt32();  // (0..2)
             var Unknown_0004 = loader.ReadSBytes(48);
@@ -88,7 +79,7 @@ namespace Syroot.Pod.Cars
             var Unknown_0014 = loader.ReadUInt32();
             var Unknown_0018 = loader.ReadUInt32();
 
-            if (FileInfo.PodDemo)
+            if (PodDemo)
             {
                 Name = loader.ReadPodString();
             }
@@ -107,19 +98,19 @@ namespace Syroot.Pod.Cars
 
             if (filename.EndsWith("bv4", System.StringComparison.CurrentCultureIgnoreCase))
             {
-                info.FileVersion = FileVersion.BV4;
+                info.FileVersion = FileType.BV4;
             }
             if (filename.EndsWith("bv3", System.StringComparison.CurrentCultureIgnoreCase))
             {
-                info.FileVersion = FileVersion.BV3;
+                info.FileVersion = FileType.BV3;
             }
             if (filename.EndsWith("bv6", System.StringComparison.CurrentCultureIgnoreCase))
             {
-                info.FileVersion = FileVersion.BV6;
+                info.FileVersion = FileType.BV6;
             }
             if (filename.EndsWith("bv7", System.StringComparison.CurrentCultureIgnoreCase))
             {
-                info.FileVersion = FileVersion.BV7;
+                info.FileVersion = FileType.BV7;
             }
 
             return info;

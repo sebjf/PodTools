@@ -4,12 +4,9 @@ using Syroot.BinaryData;
 using Syroot.Maths;
 using Syroot.Pod.IO;
 
-namespace Syroot.Pod.Cars
+namespace Syroot.Pod
 {
-    /// <summary>
-    /// Represents the surface of a polygonal model.
-    /// </summary>
-    public class Mesh : IData<Car>
+    public class Mesh
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -24,11 +21,17 @@ namespace Syroot.Pod.Cars
         /// <summary>
         /// Gets or sets the virtual size of the mesh. If too low, the mesh tends to become invisible too early.
         /// </summary>
-        public uint Uknown { get; set; }
+        public float Volume { get; set; }
+    }
 
+    /// <summary>
+    /// Represents the surface of a polygonal model.
+    /// </summary>
+    public class Mesh<T> : Mesh, IData<T> where T : PbdfFile, IData<T>, IAssetFile
+    {
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
-        void IData<Car>.Load(DataLoader<Car> loader, object parameter)
+        void IData<T>.Load(DataLoader<T> loader, object parameter)
         {
             MeshFaceParameters parameters = (MeshFaceParameters)parameter;
 
@@ -37,9 +40,9 @@ namespace Syroot.Pod.Cars
             int faceCount = loader.ReadInt32();
             int triCount = loader.ReadInt32();
             int quadCount = loader.ReadInt32();
-            Faces = loader.LoadMany<MeshFace>(faceCount, parameters).ToList();
+            Faces = loader.LoadMany<MeshFace<T>>(faceCount, parameters).Cast<MeshFace>().ToList();
             Normals = loader.ReadMany(vertexCount, () => loader.ReadVector3F16x16());
-            Uknown = loader.ReadUInt32();
+            Volume = loader.ReadSingle16x16();
 
             if (parameters.HasPrism)
             {
@@ -47,7 +50,7 @@ namespace Syroot.Pod.Cars
             }
         }
 
-        void IData<Car>.Save(DataSaver<Car> saver, object parameter)
+        void IData<T>.Save(DataSaver<T> saver, object parameter)
         {
             throw new System.NotImplementedException();
         }

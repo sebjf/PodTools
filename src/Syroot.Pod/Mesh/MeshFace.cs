@@ -1,13 +1,11 @@
 ﻿using Syroot.BinaryData;
 using Syroot.Maths;
+using Syroot.Pod;
 using Syroot.Pod.IO;
 
-namespace Syroot.Pod.Circuits
+namespace Syroot.Pod
 {
-    /// <summary>
-    /// Represents a single polygon of a <see cref="Mesh"/>.
-    /// </summary>
-    public class MeshFace : IData<Circuit>
+    public class MeshFace
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -35,9 +33,27 @@ namespace Syroot.Pod.Circuits
 
         public uint Properties { get; set; }
 
+        public sbyte Flags1;
+        public sbyte Flags2;
+        public sbyte[] Unknowns;
+
+    }
+
+    public struct MeshFaceParameters
+    {
+        public bool HasNamedFaces;
+        public bool HasUnkProperty;
+        public bool HasPrism;
+    }
+
+    /// <summary>
+    /// Represents a single polygon of a <see cref="Mesh"/>.
+    /// </summary>
+    public class MeshFace<T> : MeshFace, IData<T> where T : PbdfFile, IData<T>, IAssetFile
+    {
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
-        void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
+        void IData<T>.Load(DataLoader<T> loader, object parameter)
         {
             MeshFaceParameters parameters = (MeshFaceParameters)parameter;
 
@@ -64,20 +80,36 @@ namespace Syroot.Pod.Circuits
             TexCoords = loader.ReadMany(4, () => loader.ReadVector2U());
             Reserved1 = loader.ReadUInt32();
             if (FaceVertexCount == 4)
+            {
                 QuadReserved = loader.ReadVector3F16x16();
-            if (Normal == Vector3U.Zero)
-            {
-                Reserved2 = loader.ReadUInt32();
             }
-            else
+
+            switch (loader.Instance.FileType)
             {
-                if (parameters.HasUnkProperty)
-                    Unknown = loader.ReadUInt32();
-                Properties = loader.ReadUInt32();
+                case FileType.BL4:
+                    if (Normal == Vector3U.Zero)
+                    {
+                        Reserved2 = loader.ReadUInt32();
+                    }
+                    else
+                    {
+                        if (parameters.HasUnkProperty)
+                            Unknown = loader.ReadUInt32();
+                        Properties = loader.ReadUInt32();
+                    }
+                    break;
+                case FileType.BV3:
+                case FileType.BV4:
+                case FileType.BV6:
+                case FileType.BV7:
+                    Flags1 = loader.ReadSByte();
+                    Flags2 = loader.ReadSByte();
+                    Unknowns = loader.ReadSBytes(2);
+                    break;
             }
         }
 
-        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        void IData<T>.Save(DataSaver<T> saver, object parameter)
         {
             MeshFaceParameters parameters = (MeshFaceParameters)parameter;
 
@@ -116,11 +148,5 @@ namespace Syroot.Pod.Circuits
                 saver.WriteUInt32(Properties);
             }
         }
-    }
-
-    public struct MeshFaceParameters
-    {
-        public bool HasNamedFaces;
-        public bool HasUnkProperty;
     }
 }

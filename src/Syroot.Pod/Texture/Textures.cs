@@ -3,12 +3,12 @@ using System.Linq;
 using Syroot.BinaryData;
 using Syroot.Pod.IO;
 
-namespace Syroot.Pod.Cars
+namespace Syroot.Pod.Circuits
 {
     /// <summary>
     /// Represents 2-dimensional image data possibly storing multiple <see cref="TextureArea"/> instances.
     /// </summary>
-    public class Texture : IData<Car>
+    public class Texture
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -16,17 +16,21 @@ namespace Syroot.Pod.Cars
 
         public ushort[] Data { get; set; } // 256x256, RGB565
 
+    }
+
+    public class Texture<T> : Texture, IData<T> where T : PbdfFile, IData<T>
+    {
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
-        void IData<Car>.Load(DataLoader<Car> loader, object parameter)
+        void IData<T>.Load(DataLoader<T> loader, object parameter)
         {
-            Areas = loader.LoadMany<TextureArea>(loader.ReadInt32()).ToList();
+            Areas = loader.LoadMany<TextureArea<T>>(loader.ReadInt32()).Cast<TextureArea>().ToList();
         }
 
-        void IData<Car>.Save(DataSaver<Car> saver, object parameter)
+        void IData<T>.Save(DataSaver<T> saver, object parameter)
         {
-            saver.WriteInt32(Areas.Count);
-            saver.SaveMany(Areas);
+            throw new System.NotImplementedException();
         }
     }
+
 }

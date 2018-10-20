@@ -1,5 +1,6 @@
 ﻿using Syroot.BinaryData;
 using Syroot.Pod.IO;
+using System.Collections.Generic;
 
 namespace Syroot.Pod.Circuits
 {
@@ -21,7 +22,7 @@ namespace Syroot.Pod.Circuits
 
         public string Name { get; set; }
 
-        public TextureList Textures { get; set; }
+        public IList<Texture> Textures { get; set; }
 
         public ushort[] LensFlareTextureData { get; set; }
 
@@ -38,7 +39,7 @@ namespace Syroot.Pod.Circuits
             FadeAmount = loader.ReadInt32();
             Speed = loader.ReadInt32();
             Name = loader.ReadPodString();
-            Textures = loader.Load<TextureList>(128);
+            Textures = loader.Load<TextureList<Circuit>>(128);
             LensFlareTextureData = loader.ReadUInt16s(128 * 128);
             Unknown3 = loader.ReadInt32();
         }
@@ -52,7 +53,7 @@ namespace Syroot.Pod.Circuits
             saver.WriteInt32(FadeAmount);
             saver.WriteInt32(Speed);
             saver.WritePodString(Name);
-            saver.Save(Textures);
+            saver.Save(Textures as TextureList<Circuit>);
             saver.WriteUInt16s(LensFlareTextureData);
             saver.WriteInt32(Unknown3);
         }

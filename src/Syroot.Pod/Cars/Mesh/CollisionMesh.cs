@@ -22,7 +22,7 @@ namespace Syroot.Pod.Cars
             parameters.HasNamedFaces = loader.ReadUInt32() > 0;
             parameters.HasPrism = true;
 
-            Mesh = loader.Load<Mesh>(parameters);
+            Mesh = loader.Load<Mesh<Car>>(parameters);
 
             var Unknown_001C = loader.ReadUInt32();
             var Unknown_0024 = loader.ReadUInt32s(3);

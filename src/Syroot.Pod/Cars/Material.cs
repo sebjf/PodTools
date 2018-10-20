@@ -10,7 +10,7 @@ namespace Syroot.Pod.Cars
     public class Material : IData<Car>
     {
         public string Name { get; set; }
-        public TextureList Textures { get; set; }
+        public IList<Texture> Textures { get; set; }
 
         public void Load(DataLoader<Car> loader, object parameter = null)
         {
@@ -18,7 +18,7 @@ namespace Syroot.Pod.Cars
 
             if(Name != "GOURAUD")
             {
-                Textures = loader.Load<TextureList>(parameter);
+                Textures = loader.Load<TextureList<Car>>(parameter);
             }
         }
 

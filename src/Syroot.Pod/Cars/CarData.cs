@@ -63,10 +63,10 @@ namespace Syroot.Pod.Cars
             switch (Unknown_054C)
             {
                 case 1:
-                    (parameter as CarFileInfo).PodVersion = Cars.PodVersion.POD2;
+                    loader.Instance.PodVersion = Pod.PodVersion.POD2;
                     break;
                 case 2:
-                    (parameter as CarFileInfo).PodVersion = Cars.PodVersion.POD1;
+                    loader.Instance.PodVersion = Pod.PodVersion.POD1;
                     break;
             }
 

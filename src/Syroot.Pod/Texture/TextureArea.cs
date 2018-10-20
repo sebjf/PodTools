@@ -6,7 +6,7 @@ namespace Syroot.Pod.Circuits
     /// <summary>
     /// Represents a frame on a <see cref="Texture"/> which forms its own visual image.
     /// </summary>
-    public class TextureArea : IData<Circuit>
+    public class TextureArea
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -20,28 +20,33 @@ namespace Syroot.Pod.Circuits
 
         public int Bottom { get; set; }
 
-        public int Index { get; set; }
+        public int IndexOrFlags { get; set; }
+    }
 
+    public class TextureArea<T> : TextureArea, IData<T> where T : PbdfFile, IData<T>
+    {
         // ---- METHODS ------------------------------------------------------------------------------------------------
 
-        void IData<Circuit>.Load(DataLoader<Circuit> loader, object parameter)
+        void IData<T>.Load(DataLoader<T> loader, object parameter)
         {
             Name = loader.ReadFixedString(32);
             Left = loader.ReadInt32();
             Top = loader.ReadInt32();
             Right = loader.ReadInt32();
             Bottom = loader.ReadInt32();
-            Index = loader.ReadInt32();
+            IndexOrFlags = loader.ReadInt32();
         }
 
-        void IData<Circuit>.Save(DataSaver<Circuit> saver, object parameter)
+        void IData<T>.Save(DataSaver<T> saver, object parameter)
         {
             saver.WriteFixedString(Name, 32);
             saver.WriteInt32(Left);
             saver.WriteInt32(Top);
             saver.WriteInt32(Right);
             saver.WriteInt32(Bottom);
-            saver.WriteInt32(Index);
+            saver.WriteInt32(IndexOrFlags);
         }
+
     }
+
 }

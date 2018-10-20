@@ -9,19 +9,6 @@ namespace Syroot.Pod.Scratchpad
 {
     internal class Program
     {
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private static readonly string[] _competitorNames = new[]
-        {
-            "svfn",
-            "pnzr667",
-            "Cyantusk",
-            "Darkriot",
-            "Kenno",
-            "glhrmfrt",
-            "katywing"
-        };
-
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
         private static void Main(string[] args)
@@ -70,7 +57,8 @@ namespace Syroot.Pod.Scratchpad
 
                 Converter converter = new Converter();
                 converter.Add(circuit);
-                converter.Save(@"C:\Users\Sebastian\Documents\Unity Projects\PoD\Assets\Circuits\Alderon\Alderon.obj");
+                //converter.Save(@"C:\Users\Sebastian\Documents\Unity Projects\PoD\Assets\Circuits\Alderon\Alderon.obj");
+                converter.Save(@"C:\Users\Sebastian\Dropbox\Projects\POD\Export\Alderon.obj");
             }
         }
 

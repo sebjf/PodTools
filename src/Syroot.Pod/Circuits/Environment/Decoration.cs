@@ -14,11 +14,11 @@ namespace Syroot.Pod.Circuits
 
         public string ObjectName { get; set; }
 
-        public TextureList Textures { get; set; }
+        public IList<Texture> Textures { get; set; }
 
         public bool HasNamedFaces { get; set; }
 
-        public Mesh Mesh { get; set; }
+        public Mesh<Circuit> Mesh { get; set; }
 
         public Vector3F CollisionPrism1 { get; set; }
 
@@ -42,12 +42,13 @@ namespace Syroot.Pod.Circuits
         {
             Name = loader.ReadPodString();
             ObjectName = loader.ReadPodString();
-            Textures = loader.Load<TextureList>(128);
+            Textures = loader.Load<TextureList<Circuit>>(128);
             HasNamedFaces = loader.ReadBoolean(BooleanCoding.Dword);
-            Mesh = loader.Load<Mesh>(new MeshFaceParameters
+            Mesh = loader.Load<Mesh<Circuit>>(new MeshFaceParameters
             {
                 HasNamedFaces = HasNamedFaces,
-                HasUnkProperty = false
+                HasUnkProperty = false,
+                HasPrism = false
             });
             CollisionPrism1 = loader.ReadVector3F16x16();
             CollisionPrism2 = loader.ReadUInt32();
@@ -63,12 +64,13 @@ namespace Syroot.Pod.Circuits
         {
             saver.WritePodString(Name);
             saver.WritePodString(ObjectName);
-            saver.Save(Textures);
+            saver.Save(Textures as TextureList<Circuit>);
             saver.WriteBoolean(HasNamedFaces, BooleanCoding.Dword);
             saver.Save(Mesh, new MeshFaceParameters
             {
                 HasNamedFaces = HasNamedFaces,
-                HasUnkProperty = false
+                HasUnkProperty = false,
+                HasPrism = false
             });
             saver.WriteVector3F16x16(CollisionPrism1);
             saver.WriteUInt32(CollisionPrism2);
