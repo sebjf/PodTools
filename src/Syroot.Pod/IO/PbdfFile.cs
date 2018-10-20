@@ -22,15 +22,17 @@ namespace Syroot.Pod.IO
         /// <paramref name="fileName"/>.
         /// </summary>
         /// <param name="fileName">The name of the file to load data from.</param>
-        public PbdfFile(string fileName)
-            : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read)) { }
+        public PbdfFile(string fileName, object parameter = null)
+            : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read), parameter) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PbdfFile"/> class from the given <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> to load data from.</param>
-        public PbdfFile(Stream stream)
+        public PbdfFile(Stream stream, object parameter = null)
         {
+            Parameter = parameter;
+
             // Retrieve encryption secrets.
             Key = Pbdf.RetrieveKey(stream);
             stream.Position = 0;
@@ -55,6 +57,8 @@ namespace Syroot.Pod.IO
         }
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
+
+        public object Parameter; 
 
         /// <summary>
         /// Gets the XOR encryption key to use when saving data.
