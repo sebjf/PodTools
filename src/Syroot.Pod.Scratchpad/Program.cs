@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Syroot.Pod.IO;
 using SJF.Pod.Converter;
+using System.Globalization;
 
 namespace Syroot.Pod.Scratchpad
 {
@@ -13,7 +14,7 @@ namespace Syroot.Pod.Scratchpad
 
         private static void Main(string[] args)
         {
-            ReadCars();            
+            ReadTracks();            
         }
 
         private static void ReadCars()
@@ -35,7 +36,7 @@ namespace Syroot.Pod.Scratchpad
 
                 Converter converter = new Converter();
                 converter.Add(car);
-                converter.Save(@"C:\Users\Sebastian\Dropbox\Projects\POD\Export\Alien.obj");
+                converter.Save(@"C:\Users\Sebastian\Documents\Unity Projects\PoD\Assets\Cars\Alien\Alien.obj");
             }
         }
 
@@ -45,23 +46,25 @@ namespace Syroot.Pod.Scratchpad
 
             foreach (string inFilePath in Directory.GetFiles(inFolder, "*.bl4"))
             {
+                var name = "Plant21";
+
                 // Ignore partly broken files.
                 if (inFilePath.Contains("Arcade++"))
                     continue;
                 if (inFilePath.Contains("Forest"))
                     continue;
 
-                if (!inFilePath.Contains("AlderOEM.bl4"))
+                if(!(new CultureInfo("en-GB").CompareInfo.IndexOf(inFilePath, name, CompareOptions.IgnoreCase) >= 0)) // should be fr-FR?
+                {
                     continue;
+                }
 
                 string fileName = Path.GetFileName(inFilePath);
-
                 var circuit = new Circuits.Circuit(inFilePath);
 
                 Converter converter = new Converter();
                 converter.Add(circuit);
-                //converter.Save(@"C:\Users\Sebastian\Documents\Unity Projects\PoD\Assets\Circuits\Alderon\Alderon.obj");
-                converter.Save(@"C:\Users\Sebastian\Dropbox\Projects\POD\Export\Alderon.obj");
+                converter.Save(string.Format(@"{0}\{1}\{1}.obj", @"C:\Users\Sebastian\Documents\Unity Projects\PoD\Assets\Circuits", name));
             }
         }
 

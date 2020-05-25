@@ -14,13 +14,6 @@ namespace AssetsInfo
 
     public class CircuitInfo
     {
-        public struct Vector3
-        {
-            public float x;
-            public float y;
-            public float z;
-        }
-
         public struct Grid
         {
             public Vector3 pole;

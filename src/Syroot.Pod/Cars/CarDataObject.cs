@@ -19,7 +19,7 @@ namespace Syroot.Pod.Cars
         uint32_t   Unknown_003C;
         uint32_t   Unknown_0040;
         uint32_t   Unknown_0044;
-        fp1616_t   Position;     // [0..3].xy, -[4].z
+        public fp1616_t   Position;     // [0..3].xy, -[4].z // < what does this mean? possibly mirror in z? or offset by chassis?
         uint32_t   Unknown_0054;
         uint8_t[]  Unknown_0058; //[56];
         uint32_t   Unknown_0090;

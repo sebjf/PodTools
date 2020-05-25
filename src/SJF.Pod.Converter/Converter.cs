@@ -14,169 +14,103 @@ using JeremyAnsel.Media.WavefrontObj;
 
 namespace SJF.Pod.Converter
 {
-    public class PortableMesh
-    {
-        public List<PortableTriangle> triangles = new List<PortableTriangle>();
-    }
-
-    public class PortableMaterial
-    {
-        public string name;
-        public PortableTexture texture;
-        public PortableVector3 colour;
-    }
-
-    public class PortableTexture
-    {
-        public string name;
-        public string filename;
-        public Bitmap image;
-    }
-
-    public struct PortableVector3
-    {
-        public float x;
-        public float y;
-        public float z;
-
-        public PortableVector3(float x, float y, float z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public static implicit operator PortableVector3(Vector3F v)
-        {
-            PortableVector3 result = new PortableVector3();
-            result.x = v.X;
-            result.y = v.Y;
-            result.z = v.Z;
-            return result;
-        }
-
-        public static implicit operator ObjVector4(PortableVector3 v)
-        {
-            ObjVector4 result = new ObjVector4();
-            result.X = v.x;
-            result.Y = v.y;
-            result.Z = v.z;
-            result.W = 0;
-            return result;
-        }
-
-        public static implicit operator ObjVector3(PortableVector3 v)
-        {
-            ObjVector3 result = new ObjVector3();
-            result.X = v.x;
-            result.Y = v.y;
-            result.Z = v.z;
-            return result;
-        }
-
-        public static implicit operator ObjVertex(PortableVector3 v)
-        {
-            ObjVertex result = new ObjVertex();
-            result.Position = v;
-            return result;
-        }
-    }
-
-    public struct PortableVector2
-    {
-        public float x;
-        public float y;
-
-        public static implicit operator PortableVector2(Vector2U v)
-        {
-            PortableVector2 result = new PortableVector2();
-            result.x = v.X;
-            result.y = v.Y;
-            return result;
-        }
-
-        public static implicit operator ObjVector3(PortableVector2 v)
-        {
-            ObjVector3 result = new ObjVector3();
-            result.X = v.x;
-            result.Y = v.y;
-            result.Z = 0;
-            return result;
-        }
-    }
-
-    public struct PortableVertex
-    {
-        public PortableVector3 position;
-        public PortableVector3 normal;
-        public PortableVector2 uv;
-    }
-
-    public struct PortableTriangle
-    {
-        public PortableMaterial material;
-        public PortableVertex[] vertices;
-    }
-
-    public static class PodExtensions
-    {
-
-    }
-
     public class Converter
     {
-        PortableMesh pmesh;
-
+        Dictionary<string, PortableMesh> meshes = new Dictionary<string, PortableMesh>();
         Dictionary<uint, PortableMaterial> flatMaterials = new Dictionary<uint, PortableMaterial>();
         Dictionary<uint, PortableMaterial> textureMaterials = new Dictionary<uint, PortableMaterial>();
         List<PortableTexture> textures = new List<PortableTexture>();
 
-        AssetsInfo.CircuitInfo info;
+        private const string DefaultMesh = "default";
+        private string CurrentMesh = DefaultMesh;
+
+        private string[] wheelMeshNames = new string[]
+            {
+                "WheelFrontR",
+                "WheelRearR",
+                "WheelFrontL",
+                "WheelRearL"
+            };
+
+        AssetsInfo.CircuitInfo circuitProperties;
+        AssetsInfo.CarInfo carProperties;
 
         public Converter()
         {
-            pmesh = new PortableMesh();
+            meshes[CurrentMesh] = new PortableMesh();
         }
 
-        public void Save(string file)
+        public void Save(string file, params string[] meshnames)
         {
             var directory = Path.GetDirectoryName(file);
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            var obj = new ObjFile();
-
-            for (int i = 0; i < pmesh.triangles.Count; i++)
-            {
-                var triangle = pmesh.triangles[i];
-                var face = new ObjFace();
-
-                foreach (var vertex in triangle.vertices)
-                {
-                    obj.Vertices.Add(vertex.position);
-                    obj.VertexNormals.Add(vertex.normal);
-                    obj.TextureVertices.Add(vertex.uv);
-
-                    var index = obj.Vertices.Count;
-                    face.Vertices.Add(new ObjTriplet(index, index, index));
-                }
-
-                face.MaterialName = triangle.material.name;
-                obj.Faces.Add(face);
-            }
+            Directory.CreateDirectory(directory);
 
             foreach (var t in textures)
             {
                 t.image.Save(directory + Path.DirectorySeparatorChar + t.filename, ImageFormat.Png);
             }
 
+            if (circuitProperties != null)
+            {
+                circuitProperties.Save(directory + Path.DirectorySeparatorChar + filename + ".xml");
+                SaveObj(directory, filename, DefaultMesh);
+            }
+
+            if(carProperties != null)
+            {
+                carProperties.Save(directory + Path.DirectorySeparatorChar + filename + ".xml");
+                SaveObj(directory, filename, DefaultMesh);
+                foreach (var wheel in wheelMeshNames)
+                {
+                    SaveObj(directory, wheel, wheel);
+                }
+            }
+        }
+
+        private void SaveObj(string directory, string filename, params string[] meshnames)
+        {
+            var obj = new ObjFile();
+
+            var referenced_materials = new List<PortableMaterial>();
+
+            foreach (var name in meshnames)
+            {
+                var pmesh = meshes[name];
+
+                for (int i = 0; i < pmesh.triangles.Count; i++)
+                {
+                    var triangle = pmesh.triangles[i];
+                    var face = new ObjFace();
+
+                    face.ObjectName = name;
+
+                    foreach (var vertex in triangle.vertices)
+                    {
+                        obj.Vertices.Add(vertex.position);
+                        obj.VertexNormals.Add(vertex.normal);
+                        obj.TextureVertices.Add(vertex.uv);
+
+                        var index = obj.Vertices.Count;
+                        face.Vertices.Add(new ObjTriplet(index, index, index));
+                    }
+
+                    face.MaterialName = triangle.material.name;
+                    obj.Faces.Add(face);
+
+                    referenced_materials.Add(triangle.material);
+                }
+            }
+
             var mtl = new ObjMaterialFile();
 
-            var materials = pmesh.triangles.Select(t => t.material).Distinct();
+            var materials = referenced_materials.Distinct();
             foreach (var m in materials)
             {
                 var material = new ObjMaterial(m.name);
                 material.DiffuseColor = new ObjMaterialColor(m.colour.x, m.colour.y, m.colour.z);
-                if(m.texture != null)
+                if (m.texture != null)
                 {
                     material.DiffuseMap = new ObjMaterialMap(m.texture.filename);
                 }
@@ -188,12 +122,7 @@ namespace SJF.Pod.Converter
             mtl.WriteTo(directory + Path.DirectorySeparatorChar + filename + ".mtl");
             obj.MaterialLibraries.Add(filename + ".mtl");
 
-            obj.WriteTo(file);
-
-            if(info != null)
-            {
-                info.Save(directory + Path.DirectorySeparatorChar + filename + ".xml");
-            }
+            obj.WriteTo(directory + Path.DirectorySeparatorChar + filename + ".obj");
         }
 
         public void Add(Texture texture, string prefix)
@@ -254,26 +183,14 @@ namespace SJF.Pod.Converter
             {
             }
 
-            info = new AssetsInfo.CircuitInfo();
+            circuitProperties = new AssetsInfo.CircuitInfo();
 
             // get the start positions
-            // (remember to swap z & y)
 
-            info.grid.pole.x = circuit.DesignationForward.Starts[0].Data.X;
-            info.grid.pole.y = circuit.DesignationForward.Starts[0].Data.Z;
-            info.grid.pole.z = -circuit.DesignationForward.Starts[0].Data.Y;
-            info.grid.second.x = circuit.DesignationForward.Starts[3].Data.X;
-            info.grid.second.y = circuit.DesignationForward.Starts[3].Data.Z;
-            info.grid.second.z = -circuit.DesignationForward.Starts[3].Data.Y;
-            info.grid.third.x = circuit.DesignationForward.Starts[6].Data.X;
-            info.grid.third.y = circuit.DesignationForward.Starts[6].Data.Z;
-            info.grid.third.z = -circuit.DesignationForward.Starts[6].Data.Y;
-            info.grid.forward.x = circuit.DesignationForward.Starts[1].Data.X;
-            info.grid.forward.y = circuit.DesignationForward.Starts[1].Data.Z;
-            info.grid.forward.z = -circuit.DesignationForward.Starts[1].Data.Y;
-
-
-
+            circuitProperties.grid.pole    = CoordinateSystems.Unity(circuit.DesignationForward.Starts[0].Data);
+            circuitProperties.grid.second  = CoordinateSystems.Unity(circuit.DesignationForward.Starts[3].Data);
+            circuitProperties.grid.third   = CoordinateSystems.Unity(circuit.DesignationForward.Starts[6].Data);
+            circuitProperties.grid.forward = CoordinateSystems.Unity(circuit.DesignationForward.Starts[1].Data);
         }
 
         public void Add(Car car)
@@ -286,7 +203,15 @@ namespace SJF.Pod.Converter
             }
 
             Add(car.Geometry.Good);
-            //Add(car.Geometry.Wheels);
+            Add(car.Geometry.Wheels);
+
+            carProperties = new AssetsInfo.CarInfo();
+            carProperties.WheelRearL  = CoordinateSystems.UnityWheelPosition(car.Data.DataObjects[3].Position);
+            carProperties.WheelFrontL = CoordinateSystems.UnityWheelPosition(car.Data.DataObjects[2].Position);
+            carProperties.WheelRearR  = CoordinateSystems.UnityWheelPosition(car.Data.DataObjects[1].Position);
+            carProperties.WheelFrontR = CoordinateSystems.UnityWheelPosition(car.Data.DataObjects[0].Position);
+            carProperties.Chassis = CoordinateSystems.Unity(car.Data.DataObjects[4].Position);
+
         }
 
         void Add(Body body)
@@ -301,10 +226,11 @@ namespace SJF.Pod.Converter
 
         void Add(Wheels wheel)
         {
-            Add(wheel.FrontL);
-            Add(wheel.FrontR);
-            Add(wheel.RearL);
-            Add(wheel.RearR);
+            CurrentMesh = "WheelFrontL"; Add(wheel.FrontL);
+            CurrentMesh = "WheelFrontR"; Add(wheel.FrontR);
+            CurrentMesh = "WheelRearL"; Add(wheel.RearL);
+            CurrentMesh = "WheelRearR"; Add(wheel.RearR);
+            CurrentMesh = DefaultMesh;
         }
 
         void Add(Sector sector)
@@ -327,7 +253,11 @@ namespace SJF.Pod.Converter
 
         void Add(PortableTriangle triangle)
         {
-            pmesh.triangles.Add(triangle);
+            if(!meshes.ContainsKey(CurrentMesh))
+            {
+                meshes.Add(CurrentMesh, new PortableMesh());
+            }
+            meshes[CurrentMesh].triangles.Add(triangle);
         }
 
         PortableMaterial GetFlatMaterial(uint colour)
@@ -373,12 +303,8 @@ namespace SJF.Pod.Converter
         PortableVertex MakeVertex(Mesh mesh, MeshFace face, int i)
         {
             PortableVertex vertex = new PortableVertex();
-            vertex.position.x = mesh.Positions[face.Indices[i]].X;
-            vertex.position.y = mesh.Positions[face.Indices[i]].Z;
-            vertex.position.z = -mesh.Positions[face.Indices[i]].Y;
-            vertex.normal.x = mesh.Normals[face.Indices[i]].X;
-            vertex.normal.y = mesh.Normals[face.Indices[i]].Z;
-            vertex.normal.z = -mesh.Normals[face.Indices[i]].Y;
+            vertex.position = CoordinateSystems.Unity(mesh.Positions[face.Indices[i]]);
+            vertex.normal = CoordinateSystems.Unity(mesh.Normals[face.Indices[i]]);
             vertex.uv.x = face.TexCoords[i].X / 255f;
             vertex.uv.y = 1f - (face.TexCoords[i].Y / 255f);
 
